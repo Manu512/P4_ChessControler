@@ -1,0 +1,1 @@
+{"players": {"1": {"_id": 1, "name": "WALDNER", "first_name": "Emmanuel", "dob": "18/06/1980", "_genre": "H", "elo": "1200", "score": 0, "versus": [], "status": false}, "2": {"_id": 2, "name": "WALDNER", "first_name": "Rapha\u00ebl", "dob": "17/08/2018", "_genre": "H", "elo": 0, "score": 0, "versus": [], "status": false}}}

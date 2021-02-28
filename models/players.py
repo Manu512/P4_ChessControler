@@ -4,21 +4,26 @@ from datetime import datetime as dt
 
 
 class Player:
-
+    """
+    Classe qui va gérer l'ensemble des joueurs. Participant ou non au tournoi.
+    """
     NB_PLAYER = 0
     PLAYERS = []
 
     def __init__(self, **kwargs):
-        self.id = kwargs['id']
-        Player.NB_PLAYER = self.id
         self.name = kwargs['name']
         self.first_name = kwargs['first_name']
         self.dob = kwargs['dob']
-        self._genre = kwargs['sexe']
-        self.elo = kwargs['elo']
-        self.point = kwargs['score']
-        self.versus = kwargs['versus']
-        self.status = kwargs['status']
+        self._genre = kwargs['_genre']
+        self.elo = 0
+        self.point = 0
+        self.versus = []
+        self.status = False
+        Player.NB_PLAYER = Player.NB_PLAYER + 1
+        self._id = Player.NB_PLAYER
+
+        for attr_name, attr_value in kwargs.items():
+            setattr(self, attr_name, attr_value)
         Player.PLAYERS.append(self)
 
     def __repr__(self):
@@ -30,12 +35,18 @@ class Player:
 
     @property
     def age(self) -> int:
+        """
+        Propriété permettant de calculer l'age a l'aide de la date
+        d'anniversaire.
+        """
+        birth = dt.strptime(self.dob, '%d/%m/%Y')
         today = dt.today()
-        return today.year - self.dob.year - ((today.month, today.day) < (self.dob.month, self.dob.day))
+        return today.year - birth.year - (
+                    (today.month, today.day) < (birth.month, birth.day))
 
     @property
     def sexe(self) -> str:
-        if self._genre:
+        if self._genre == 'F':
             sexe = 'Femme'
         else:
             sexe = 'Homme'
@@ -43,6 +54,9 @@ class Player:
 
     def update_classement(self, new_classement: int):
         self.elo = new_classement
+
+    def update_dob(self, new_dob: str):
+        self.dob = new_dob
 
     def win_round(self):
         self.point += 1
@@ -69,11 +83,11 @@ class Player:
         players_db.insert_multiple(serialized_players)
 
     def __serialize_player(self):
-        self.data = {"id": self.id,
+        self.data = {"_id": self._id,
                      "name": self.name,
                      "first_name": self.first_name,
                      "dob": self.dob,
-                     "sexe": self.sexe,
+                     "_genre": self._genre,
                      "elo": self.elo,
                      "score": self.point,
                      "versus": self.versus,
@@ -98,35 +112,13 @@ class Player:
         cls.list_all = cls.players_db.all()
         [print(data) for data in cls.list_all]
 
-
     @staticmethod
     def player_db_acces():
         db = TinyDB('players.json')
         return db.table('players')
 
 
-
-
 if __name__ == '__main__':
-    # joueurs_factice = [Player(name='WALDNER', first_name='Emmanuel', date_of_birth='18/06/1980', sexe=0, elo=1200),
-    #                    Player(name='BREDERECK', first_name='Estelle', date_of_birth='05/07/1980', sexe=1, elo=1000),
-    #                    Player(name='WALDNER', first_name='Bernard', date_of_birth='26/01/1950', sexe=0, elo=800),
-    #                    Player(name='WALDNER', first_name='Eliane', date_of_birth='18/04/1953', sexe=1, elo=900),
-    #                    Player(name='BREDERECK', first_name='Leon', date_of_birth='22/07/1956', sexe=0, elo=1200),
-    #                    Player(name='WALDNER', first_name='Raphael', date_of_birth='17/07/2018', sexe=0, elo=1200),
-    #                    Player(name='PFIRSCH', first_name='Bernadette', date_of_birth='03/05/1959', sexe=1, elo=1050),
-    #                    Player(name='WITZ', first_name='Manuel', date_of_birth='05/08/1971', sexe=0, elo=1150)]
-
-
-    # self.players_db.truncate()
-    # serialized_players = [p.save_player() for player in players]
-    # player_data.insert_multiple(serialized_players)
-    # db = TinyDB('players.json')
-    # players_db = db.table('players')
-    # players_db.truncate()
-    # serialized_players = [player.save_player() for player in Player.PLAYERS]
-    # players_db.insert_multiple(serialized_players)
-
     Player.load_players()
     Player.list_all_player()
     print("heu....")
