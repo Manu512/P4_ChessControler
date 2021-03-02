@@ -5,72 +5,72 @@ import re
 from datetime import datetime as dt
 from models.players import Player
 from views.views import Display
+from models.tournoi import Tournoi
 
 
 class Controller:
 
     def __init__(self):
         Player.load_players()
+        self.control_tournament = ''
         self.view_menu = Display()
         self.menu_accueil()
 
     def menu_accueil(self):
         self.view_menu.accueil()
-        menu = {"1": self.menu_tournament,
-                "2": self.menu_players,
-                "3": self.menu_rapport,
-                "4": exit}
+        menu = {1: self.menu_tournament,
+                2: self.menu_players,
+                3: self.menu_rapport,
+                4: exit}
 
         response = self.c_input()
         if self.__check_choice(menu, response):
-            menu[response]()
-            self.menu_accueil()
-        else:
-            self.menu_accueil()
-        
+            menu[int(response)]()
+
+        self.menu_accueil()
+
     def menu_players(self):
         self.view_menu.players()
-        menu = {"1": self.add_player,
-                "2": self.update_player_elo,
-                "3": self.add_player_tournament,
-                "4": self.remove_player_tournament,
-                "5": self.menu_accueil}
+        menu = {1: self.add_player,
+                2: self.update_player_elo,
+                3: self.add_player_tournament,
+                4: self.remove_player_tournament,
+                5: self.menu_accueil}
 
         response = self.c_input()
         if self.__check_choice(menu, response):
-            menu[response]()
-            self.menu_players()
-        else:
-            self.menu_players()
+            menu[int(response)]()
+
+        self.menu_players()
 
     def menu_tournament(self):
         self.view_menu.tournament()
-        menu = {"1": self.new_tournament,
-                "2": self.load_tournament,
-                "3": self.save_tournament,
-                "4": self.menu_accueil}
+        menu = {1: self.new_tournament,
+                2: self.load_tournament,
+                3: self.save_tournament,
+                4: self.menu_accueil}
 
         response = self.c_input()
         if self.__check_choice(menu, response):
-            menu[response]()
-        else:
-            self.menu_tournament()
+            menu[int(response)]()
+
+        self.menu_tournament()
 
     def menu_rapport(self):
         self.view_menu.rapport()
-        menu = {"1": self.list_all_players,
-                "2": self.list_tournament_players,
-                "3": self.list_tournaments,
-                "4": self.list_all_rounds,
-                "5": self.list_all_matchs,
-                "6": self.menu_accueil}
+        menu = {1: self.list_all_players,
+                2: self.list_tournament_players,
+                3: self.list_tournaments,
+                4: self.list_all_rounds,
+                5: self.list_all_matchs,
+                6: self.menu_accueil}
 
         response = self.c_input()
         if self.__check_choice(menu, response):
-            menu[response]()
-            self.menu_rapport()
-        else:
-            self.menu_rapport()
+            menu[int(response)]()
+
+        self.menu_rapport()
+
 
 # --------------------------_PLAYERS METHODS------------------------------------
 
@@ -91,7 +91,7 @@ class Controller:
             response.append(res)
             res = dict(zip(choice, response))
         Player(**res)
-        Player._save_players()
+        Player.save_players()
         self.menu_players()
 
     def update_player_elo(self):
@@ -107,8 +107,7 @@ class Controller:
             while not self.__controle_data_input('elo', res):
                 res = self.c_input("Veuillez renseigner le nouveau ELO : ")
             player.elo = res
-            Player._save_players()
-
+            Player.save_players()
 
     def add_player_tournament(self):
         """
@@ -129,7 +128,7 @@ class Controller:
                                                   player.first_name))
                 if self.__controle_data_input("bool", res):
                     player.switch_player_tournament()
-                    Player._save_players()
+                    Player.save_players()
 
     def remove_player_tournament(self):
         """
@@ -150,7 +149,7 @@ class Controller:
                                                   player.first_name))
                 if self.__controle_data_input("bool", res):
                     player.switch_player_tournament()
-                    Player._save_players()
+                    Player.save_players()
 
     def found_specific_player(self):
         search_question = ('Nom du joueur recherché : ',
@@ -169,13 +168,62 @@ class Controller:
                 return player
 
         Display.error_msg("Joueur introuvable !\n"
-                  "Recherché à nouveau ou créer le joueur")
+                          "Recherché à nouveau ou créer le joueur")
         return None
 
 # --------------------------TOURNAMENTS METHODS--------------------------------
 
     def new_tournament(self):
+        info = {"Nom": Tournoi.NAME,
+                "Nombre de rounds": Tournoi.NB_ROUND,
+                "Règle de temps": Tournoi.TIMER,
+                "Description": Tournoi.DESCRIPTION,
+                "Initialiser le tournoi": "",
+                "Retour au menu": ""}
+
+        choice = {1: self.change_name_tournament,
+                  2: self.change_number_round_tournament,
+                  3: self.change_timer_rules,
+                  4: self.add_description,
+                  5: self.create_tournament,
+                  6: self.menu_accueil
+                  }
+
+        Display.new_tournament(Display, **info)
+
+        response = self.c_input()
+
+        if self.__check_choice(list(range(1, len(info) + 1)), response):
+            choice[int(response)]()
+
+        self.new_tournament()
+
+    def change_name_tournament(self):
+        response = self.c_input("Saisir le nom du tournoi : ")
+        if self.__controle_data_input("sentence", response):
+            Tournoi.NAME = response
+        else:
+            self.change_name_tournament()
+
+    def change_number_round_tournament(self):
+        response = self.c_input("Saisir le nombre de tours du tournoi : ")
+        if self.__controle_data_input("number", response):
+            Tournoi.NB_ROUND = response
+        else:
+            self.change_number_round_tournament()
+
+    def change_timer_rules(self):
         pass
+
+    def add_description(self):
+        response = self.c_input("Saisir la description du tournoi : ")
+        if self.__controle_data_input("sentence", response):
+            Tournoi.DESCRIPTION = response
+        else:
+            self.add_description()
+
+    def create_tournament(self):
+        self.control_tournament = Tournoi()
 
     def load_tournament(self):
         pass
@@ -195,7 +243,7 @@ class Controller:
         """
         Fonction qui va lancer le print de la liste des joueurs du tournois
         """
-        pass
+        Player._list_player_tournament()
 
     def list_tournaments(self):
         """
@@ -216,8 +264,8 @@ class Controller:
         pass
 
 # --------------------------GENERAL METHODS------------------------------------
-
-    def c_input(self, ask_input="Votre choix : "):
+    @staticmethod
+    def c_input(ask_input="Votre choix : "):
         response = input(ask_input)
         return response
 
@@ -229,8 +277,12 @@ class Controller:
                 Display.error_msg('Nom/Prénom saisi non valide !'
                                   '\nVeuillez resaissir !')
                 return False
-
-        if question == 'dob':
+        if question == 'sentence':
+            if self.__check_sentence(response) < 2:
+                Display.error_msg('Saisie non valide !'
+                                  '\nVeuillez resaissir !')
+                return False
+        elif question == 'dob':
             # Controle le format de la date de naissance
             try:
                 dt.strptime(response, '%d/%m/%Y')
@@ -248,27 +300,27 @@ class Controller:
                 Display.error_msg('Réponse non valide !'
                                   '\nVeuillez resaissir !')
                 return False
-        elif question == 'elo':
+        elif question == 'number':
             try:
                 int(response)
             except ValueError:
-                Display.error_msg('Veuillez saisir un entier pour le elo !'
+                Display.error_msg('Veuillez saisir un nombre entier !'
                                   '\nVeuillez resaissir !')
                 return False
             else:
                 if int(response) < 0:
-                    Display.error_msg('Veuillez saisir un entier positif pour'
-                                      ' le elo !\nVeuillez resaissir !')
+                    Display.error_msg('Veuillez saisir un nombre entier !'
+                                      '\nVeuillez resaissir !')
                     return False
         return True
 
-    def __check_choice(self, menu: dict, response: str) -> bool:
-        if len(response) != 1:
+    def __check_choice(self, menu, response: int) -> bool:
+        if len(str(response)) != 1:
             Display.error_msg("Choix incorrect. Un chiffre demandé."
                               " Veuillez ressaisir !")
             self.c_input("Pressez une touche pour continuer...")
             return False
-        elif response not in list(menu):
+        elif int(response) not in list(menu):
             Display.error_msg("Choix incorrect !! Veuillez ressaisir")
             self.c_input("Pressez une touche pour continuer...")
             return False
@@ -281,6 +333,13 @@ class Controller:
          la variable passé en paramètre """
         chiffre_pattern = re.compile('\d')
         return re.search(chiffre_pattern, string)
+
+    @staticmethod
+    def __check_sentence(string):
+        """ Verification d'absence de chiffre dans
+         la variable passé en paramètre """
+        sentence_pattern = re.compile('[a-z]+')
+        return len([*re.finditer(sentence_pattern, string)])
 
 
 if __name__ == '__main__':

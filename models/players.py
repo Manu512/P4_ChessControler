@@ -80,7 +80,7 @@ class Player:
             self.status = True
 
     @classmethod
-    def _save_players(cls):
+    def save_players(cls):
         """
         Methode de classe permettant de sauvegarder l'ensemble des joueurs.
         Class method allowing all players to be saved.
@@ -125,6 +125,10 @@ class Player:
     @classmethod
     def _list_all_player(cls):
         [print(player) for player in cls._PLAYERS]
+
+    @classmethod
+    def _list_player_tournament(cls):
+        [print(player) for player in cls._PLAYERS if player.status]
 
     @staticmethod
     def __player_db_acces():
