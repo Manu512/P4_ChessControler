@@ -39,6 +39,7 @@ class Controller:
         response = self.c_input()
         if self.__check_choice(menu, response):
             menu[response]()
+            self.menu_players()
         else:
             self.menu_players()
 
@@ -67,6 +68,7 @@ class Controller:
         response = self.c_input()
         if self.__check_choice(menu, response):
             menu[response]()
+            self.menu_rapport()
         else:
             self.menu_rapport()
 
@@ -100,11 +102,12 @@ class Controller:
         4° Input pour le nouveau classement
         """
         player = self.found_specific_player()
-        res = self.c_input("Veuillez renseigner le nouveau ELO : ")
-        while not self.__controle_data_input('elo', res):
+        if player is not None:
             res = self.c_input("Veuillez renseigner le nouveau ELO : ")
-        player.elo = res
-        Player._save_players()
+            while not self.__controle_data_input('elo', res):
+                res = self.c_input("Veuillez renseigner le nouveau ELO : ")
+            player.elo = res
+            Player._save_players()
 
 
     def add_player_tournament(self):
@@ -113,7 +116,20 @@ class Controller:
         2° Recherche du joueur s'il n'est pas déjà actif dans le tournoi
         3° Demande validation quant au passage du status à 1
         """
-        pass
+        player = self.found_specific_player()
+        if player is not None:
+            if player.status:
+                Display.error_msg("Attention {} {} est déjà "
+                                  "inscrit au tournoi"
+                                  .format(player.name, player.first_name))
+            else:
+                res = self.c_input("Confirmez vous que {} {} "
+                                   "participe au tournoi ? "
+                                   "(O/N)".format(player.name,
+                                                  player.first_name))
+                if self.__controle_data_input("bool", res):
+                    player.switch_player_tournament()
+                    Player._save_players()
 
     def remove_player_tournament(self):
         """
@@ -121,7 +137,20 @@ class Controller:
         2° Recherche du joueur s'il n'est pas déjà inactif dans le tournoi
         3° Demande validation quant au passage du status à 1
         """
-        pass
+        player = self.found_specific_player()
+        if player is not None:
+            if not player.status:
+                Display.error_msg("Attention {} {} est déjà "
+                                  "inscrit au tournoi"
+                                  .format(player.name, player.first_name))
+            else:
+                res = self.c_input("Confirmez vous que {} {} "
+                                   "participe plus au tournoi ? "
+                                   "(O/N)".format(player.name,
+                                                  player.first_name))
+                if self.__controle_data_input("bool", res):
+                    player.switch_player_tournament()
+                    Player._save_players()
 
     def found_specific_player(self):
         search_question = ('Nom du joueur recherché : ',
@@ -134,11 +163,14 @@ class Controller:
             search_response.append(res)
 
         for player in Player._PLAYERS:
-            if player.name == search_response[0] and\
-                    player.first_name == search_response[1]:
+            if player.name.upper() == search_response[0].upper() and\
+                    player.first_name.capitalize() == search_response[1].capitalize():
+                print(player)
                 return player
-            else:
-                self.found_specific_player()
+
+        Display.error_msg("Joueur introuvable !\n"
+                  "Recherché à nouveau ou créer le joueur")
+        return None
 
 # --------------------------TOURNAMENTS METHODS--------------------------------
 
@@ -209,6 +241,11 @@ class Controller:
         elif question == '_genre':
             if response not in ['H', 'F']:
                 Display.error_msg('Genre saisi non valide !'
+                                  '\nVeuillez resaissir !')
+                return False
+        elif question == 'bool':
+            if response not in ['O', 'N']:
+                Display.error_msg('Réponse non valide !'
                                   '\nVeuillez resaissir !')
                 return False
         elif question == 'elo':
