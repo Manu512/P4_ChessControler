@@ -67,3 +67,7 @@ if __name__ == '__main__':
     t = Tour()
     t.add_match(m)
     print(t)
+
+    def test(essai, /, test2, test3, *, enfin, peutetre):
+        print(essai)
+        print(test2)

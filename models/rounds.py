@@ -3,18 +3,21 @@
 import datetime as dt
 from uuid import uuid4
 
+from .players import Player
+
 class Round:
     """Contient les informations Date de debut et de fin, et listes des matchs à venir"""
     N_ROUND = 0
     MAX_ROUND = 8
 
-    def __init__(self):
+    def __init__(self, players):
         Round.N_ROUND += 1
         self.id = str(uuid4())
         self.name = 'Round {}'.format(Round.N_ROUND)
         self.start = dt.datetime.now()
         self.end = ''
         self.matchs = []
+        self.players = players
 
     def __repr__(self):
         return self.name
@@ -52,15 +55,17 @@ class Round:
             self.players = self.sort_player(self.players)
             nb_joueur = len(self.players)
             if len(players_list_1) % 2 == 0:
-                pass
+                players_list_1 = self.players[:nb_joueur // 2]
+                players_list_2 = self.players[nb_joueur // 2):]
+
+                first_round = list(zip(players_list_1, players_list_2))
+                return first_round
+
             else:
                 print("Il manque un joueur pour générer toutes les paires")
+                """a retoucher dans controler et players"""
 
-            players_list_1 = self.players[:int(nb_joueur / 2)]
-            players_list_2 = self.players[int(nb_joueur / 2):]
 
-            first_round = list(zip(players_list_1, players_list_2))
-            return first_round
         else:
             self.sort_player(self.players)
             other_round = []
@@ -98,9 +103,6 @@ if __name__ == '__main__':
     joueurs_factice[3].point = 15
     joueurs_factice[2].point = 10
     joueurs_factice[0].point = 15
-    player_data = db.table('players')
-    data = [p.save_player() for p in joueurs_factice]
-    player_data.insert_multiple(data)
-    round = RoundController(joueurs_factice)
+    round = Round()
     round = round.define_matchs_in_round()
     print(round)
