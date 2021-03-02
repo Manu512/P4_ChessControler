@@ -24,6 +24,7 @@ class Controller:
         response = self.c_input()
         if self.__check_choice(menu, response):
             menu[response]()
+            self.menu_accueil()
         else:
             self.menu_accueil()
         

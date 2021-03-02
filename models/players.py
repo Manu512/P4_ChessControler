@@ -124,9 +124,7 @@ class Player:
 
     @classmethod
     def _list_all_player(cls):
-        cls.players_db = cls.__player_db_acces()
-        cls.list_all = cls.players_db.all()
-        [print(data) for data in cls.list_all]
+        [print(player) for player in cls._PLAYERS]
 
     @staticmethod
     def __player_db_acces():

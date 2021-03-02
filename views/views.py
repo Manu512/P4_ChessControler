@@ -82,7 +82,7 @@ class Display:
         """Method permettant d'afficher les menus ou les informations
          contenues dans une liste"""
 
-        if menu is list:
+        if type(menu) is list:
             for info in menu:
                 print("\t", info)
         else:
