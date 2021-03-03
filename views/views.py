@@ -38,7 +38,8 @@ class Display:
         menu = {"1": "Configurer un nouveau tournoi",
                 "2": "Charger un tournoi sauvegardé",
                 "3": "Sauvegarder tournoi actuel",
-                "4": "Retour Accueil"}
+                "4": "Gestion des rounds",
+                "5": "Retour Accueil"}
 
         self.view_menu(menu)
         return menu
@@ -83,8 +84,14 @@ class Display:
         self.view_menu(menu, True)
         return menu
 
+    def sub_round(self, **kwargs):
+        self.clean()
+        print("Bienvenue dans le gestionnaire de tournois d'échec."
+              "\nGestion des rounds du tournoi.\n")
 
-
+        menu = list(zip(range(1,len(kwargs)+1),list(kwargs),list(kwargs.values())))
+        self.view_menu(menu, True)
+        return menu
 
 # -------------------------SubMenu Player--------------------------------------
 

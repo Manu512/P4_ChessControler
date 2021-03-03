@@ -18,7 +18,7 @@ class Player:
         self._genre = kwargs['_genre']
         self.elo = 0
         self.point = 0
-        self.versus = []
+        self.has_met = []
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
         self._id = Player._NB_PLAYER
@@ -70,12 +70,12 @@ class Player:
     def equality_round(self):
         self.point += 0.5
 
-    def add_versus(self, tour):
-        self.versus.append(tour)
+    def add_meet(self, player: str):
+        self.has_met.append(player)
 
     def switch_player_tournament(self):
         """Change le status du joueur dans le tournoi
-        Change the status of the player in the tournament
+        Change the status of the players in the tournament
         """
         if self.status:
             self.status = False
@@ -84,6 +84,29 @@ class Player:
 
         p = []
         Player._NB_ACTIVE_PLAYERS = len([p.append(player) for player in Player._PLAYERS if player.status])
+
+    @classmethod
+    def isactiveplayerlistpair(cls):
+        """Method to find out if the list of active players is an even one
+        Method permettant de savoir si la liste des joueurs actifs est pair
+        """
+        cls.list_player_tournament()
+        if cls._NB_ACTIVE_PLAYERS % 2:
+            return False                 # Impair
+        else:
+            return True                  # Paire
+
+    @classmethod
+    def _list_all_player(cls):
+        [print(player) for player in cls._PLAYERS]
+
+    @classmethod
+    def list_player_tournament(cls):
+        var = [player for player in cls._PLAYERS if player.status]
+        cls._NB_ACTIVE_PLAYERS = len(var)
+        return var
+
+# --------------------------TinyDB parts---------------------------------------
 
     @classmethod
     def save_players(cls):
@@ -105,7 +128,7 @@ class Player:
                      "_genre": self._genre,
                      "elo": self.elo,
                      "score": self.point,
-                     "versus": self.versus,
+                     "has_met": self.has_met,
                      "status": self.status}
         return self.data
 
@@ -120,21 +143,6 @@ class Player:
         players_db = cls.__player_db_acces()
         serialized_players_list = players_db.all()
         [Player(**data) for data in serialized_players_list]
-
-    @classmethod
-    def _isactiveplayerlistpair(cls):
-        """Method to find out if the list of active players is an even one
-        Method permettant de savoir si la liste des joueurs actifs est pair
-        """
-        return cls._NB_ACTIVE_PLAYERS % 2
-
-    @classmethod
-    def _list_all_player(cls):
-        [print(player) for player in cls._PLAYERS]
-
-    @classmethod
-    def _list_player_tournament(cls):
-        [print(player) for player in cls._PLAYERS if player.status]
 
     @staticmethod
     def __player_db_acces():

@@ -6,6 +6,8 @@ from datetime import datetime as dt
 from models.players import Player
 from views.views import Display
 from models.tournoi import Tournoi
+from models.rounds import Round
+from controllers.round_controller import RoundController as rc
 
 
 class Controller:
@@ -24,7 +26,7 @@ class Controller:
                 4: exit}
 
         response = self.c_input()
-        if self.__check_choice(menu, response):
+        if self._check_choice(menu, response):
             menu[int(response)]()
 
         self.menu_accueil()
@@ -38,7 +40,7 @@ class Controller:
                 5: self.menu_accueil}
 
         response = self.c_input()
-        if self.__check_choice(menu, response):
+        if self._check_choice(menu, response):
             menu[int(response)]()
 
         self.menu_players()
@@ -48,10 +50,11 @@ class Controller:
         menu = {1: self.new_tournament,
                 2: self.load_tournament,
                 3: self.save_tournament,
-                4: self.menu_accueil}
+                4: self.call_round_controller,
+                5: self.menu_accueil}
 
         response = self.c_input()
-        if self.__check_choice(menu, response):
+        if self._check_choice(menu, response):
             menu[int(response)]()
 
         self.menu_tournament()
@@ -66,11 +69,11 @@ class Controller:
                 6: self.menu_accueil}
 
         response = self.c_input()
-        if self.__check_choice(menu, response):
+        if self._check_choice(menu, response):
             menu[int(response)]()
 
-        self.menu_rapport()
-
+    def call_round_controller(self):
+        rc(Player.list_player_tournament(), self),
 
 # --------------------------_PLAYERS METHODS------------------------------------
 
@@ -86,7 +89,7 @@ class Controller:
         menu = self.view_menu.add_player()
         for m in range(len(choice)):
             res = self.c_input(menu[m][2:] + ' : ')
-            while not self.__controle_data_input(choice[m], res):
+            while not self._controle_data_input(choice[m], res):
                 res = self.c_input(menu[m][2:] + ' : ')
             response.append(res)
             res = dict(zip(choice, response))
@@ -104,7 +107,7 @@ class Controller:
         player = self.found_specific_player()
         if player is not None:
             res = self.c_input("Veuillez renseigner le nouveau ELO : ")
-            while not self.__controle_data_input('elo', res):
+            while not self._controle_data_input('elo', res):
                 res = self.c_input("Veuillez renseigner le nouveau ELO : ")
             player.elo = res
             Player.save_players()
@@ -126,7 +129,7 @@ class Controller:
                                    "participe au tournoi ? "
                                    "(O/N)".format(player.name,
                                                   player.first_name))
-                if self.__controle_data_input("bool", res):
+                if self._controle_data_input("bool", res):
                     player.switch_player_tournament()
                     Player.save_players()
 
@@ -147,7 +150,7 @@ class Controller:
                                    "participe plus au tournoi ? "
                                    "(O/N)".format(player.name,
                                                   player.first_name))
-                if self.__controle_data_input("bool", res):
+                if self._controle_data_input("bool", res):
                     player.switch_player_tournament()
                     Player.save_players()
 
@@ -157,7 +160,7 @@ class Controller:
         search_response = []
         for question in search_question:
             res = self.c_input(question)
-            while not self.__controle_data_input('text', res):
+            while not self._controle_data_input('text', res):
                 res = self.c_input(question)
             search_response.append(res)
 
@@ -193,31 +196,32 @@ class Controller:
 
         response = self.c_input()
 
-        if self.__check_choice(list(range(1, len(info) + 1)), response):
+        if self._check_choice(list(range(1, len(info) + 1)), response):
             choice[int(response)]()
 
         self.new_tournament()
 
     def change_name_tournament(self):
         response = self.c_input("Saisir le nom du tournoi : ")
-        if self.__controle_data_input("sentence", response):
+        if self._controle_data_input("sentence", response):
             Tournoi.NAME = response
         else:
             self.change_name_tournament()
 
     def change_number_round_tournament(self):
         response = self.c_input("Saisir le nombre de tours du tournoi : ")
-        if self.__controle_data_input("number", response):
+        if self._controle_data_input("number", response):
             Tournoi.NB_ROUND = response
         else:
             self.change_number_round_tournament()
 
     def change_timer_rules(self):
+        #TODO : Mettre en place l'input et le controle
         pass
 
     def add_description(self):
         response = self.c_input("Saisir la description du tournoi : ")
-        if self.__controle_data_input("sentence", response):
+        if self._controle_data_input("sentence", response):
             Tournoi.DESCRIPTION = response
         else:
             self.add_description()
@@ -231,6 +235,30 @@ class Controller:
     def save_tournament(self):
         pass
 
+# -------------------------- Round -------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # --------------------------RAPPORT METHODS------------------------------------
 
     def list_all_players(self):
@@ -243,7 +271,7 @@ class Controller:
         """
         Fonction qui va lancer le print de la liste des joueurs du tournois
         """
-        Player._list_player_tournament()
+        Player.list_player_tournament()
 
     def list_tournaments(self):
         """
@@ -270,17 +298,19 @@ class Controller:
         return response
 
 # -------------------------CONTROL METHODS-------------------------------------
-    def __controle_data_input(self, question, response) -> bool:
+    def _controle_data_input(self, question, response) -> bool:
         # Controle presence de chiffre dans le name/firstname
         if question in ['name', 'first_name', 'text']:
             if self.__check_number_in_word(response):
                 Display.error_msg('Nom/Prénom saisi non valide !'
                                   '\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
         if question == 'sentence':
             if self.__check_sentence(response) < 2:
                 Display.error_msg('Saisie non valide !'
                                   '\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
         elif question == 'dob':
             # Controle le format de la date de naissance
@@ -289,16 +319,19 @@ class Controller:
             except ValueError:
                 Display.error_msg('Veuillez saisir une date de naissance'
                                   ' valide !\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
         elif question == '_genre':
             if response not in ['H', 'F']:
                 Display.error_msg('Genre saisi non valide !'
                                   '\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
         elif question == 'bool':
             if response not in ['O', 'N']:
                 Display.error_msg('Réponse non valide !'
                                   '\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
         elif question == 'number':
             try:
@@ -306,26 +339,31 @@ class Controller:
             except ValueError:
                 Display.error_msg('Veuillez saisir un nombre entier !'
                                   '\nVeuillez resaissir !')
+                self.input_press_continue()
                 return False
             else:
                 if int(response) < 0:
                     Display.error_msg('Veuillez saisir un nombre entier !'
                                       '\nVeuillez resaissir !')
+                    self.input_press_continue()
                     return False
         return True
 
-    def __check_choice(self, menu, response: int) -> bool:
+    def _check_choice(self, menu, response: int) -> bool:
         if len(str(response)) != 1:
             Display.error_msg("Choix incorrect. Un chiffre demandé."
                               " Veuillez ressaisir !")
-            self.c_input("Pressez une touche pour continuer...")
+            self.input_press_continue()
             return False
         elif int(response) not in list(menu):
             Display.error_msg("Choix incorrect !! Veuillez ressaisir")
-            self.c_input("Pressez une touche pour continuer...")
+            self.input_press_continue()
             return False
         else:
             return True
+
+    def input_press_continue(self):
+        self.c_input("Pressez une touche pour continuer...")
 
     @staticmethod
     def __check_number_in_word(string):
@@ -344,4 +382,13 @@ class Controller:
 
 if __name__ == '__main__':
     d = Controller()
-    d.menu_accueil()
+    player_activ = Player.list_player_tournament()
+    r = Round(player_activ)
+    match = r.define_matchs_in_round()
+    print(match)
+
+    r2 = Round(player_activ)
+    match = r.define_matchs_in_round()
+    print(match)
+
+
