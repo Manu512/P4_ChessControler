@@ -28,7 +28,7 @@ class Player:
         Player._PLAYERS.append(self)
 
     def __repr__(self):
-        return "{} {} - elo : {} " \
+        return "{} {} - ELO : {} " \
                "- Pts : {} " \
                "- Engagé : {}".format(self.name,
                                       self.first_name,
@@ -49,6 +49,9 @@ class Player:
 
     @property
     def sexe(self) -> str:
+        """
+        Propriété pour afficher le genre de facon lisible
+        """
         if self._genre == 'F':
             sexe = 'Femme'
         else:
@@ -56,10 +59,10 @@ class Player:
         return sexe
 
     def update_classement(self, new_classement: int):
+        """
+        Methode pour mettre a jour le classement
+        """
         self.elo = new_classement
-
-    def update_dob(self, new_dob: str):
-        self.dob = new_dob
 
     def win_round(self):
         self.point += 1
@@ -78,6 +81,9 @@ class Player:
             self.status = False
         else:
             self.status = True
+
+        p = []
+        Player._NB_ACTIVE_PLAYERS = len([p.append(player) for player in Player._PLAYERS if player.status])
 
     @classmethod
     def save_players(cls):
