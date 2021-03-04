@@ -1,7 +1,8 @@
 # coding: utf-8
 from datetime import datetime as dt
+from uuid import uuid4
 
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 
 
 class Player:
@@ -17,12 +18,13 @@ class Player:
         self.first_name = kwargs['first_name']
         self.dob = kwargs['dob']
         self._genre = kwargs['_genre']
-        self.elo = 0
-        self.point = 0
+        self.elo = kwargs['elo'] or 0
+        self.point = kwargs['point'] or 0
         self.has_met = []
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
         self.id = Player._NB_PLAYER
+        self.__uuid = str(uuid4())
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
@@ -30,6 +32,12 @@ class Player:
 
     def __repr__(self):
         return "{} - ELO : {} - Pts : {} ".format(self.fullname, self.elo, self.point)
+
+    def update_player(self):
+        q = Query()
+        players_table = self.__player_db_acces()
+        player_data = self.__serialize_player()
+        players_table.upsert(player_data, q._Player__uuid == self.__uuid)
 
     @property
     def age(self) -> int:
@@ -62,6 +70,7 @@ class Player:
         Methode pour mettre a jour le classement
         """
         self.elo = new_classement
+        self.update_player()
 
     def win(self):
         self.point += 1
@@ -71,6 +80,7 @@ class Player:
 
     def add_meet(self, player: str):
         self.has_met.append(player)
+        self.update_player()
 
     def switch_player_tournament(self):
         """Change le status du joueur dans le tournoi
@@ -109,7 +119,7 @@ class Player:
 # --------------------------TinyDB parts---------------------------------------
 
     @classmethod
-    def save_players(cls):
+    def save_all_players(cls):
         """
         Methode de classe permettant de sauvegarder l'ensemble des joueurs.
         Class method allowing all players to be saved.
@@ -124,16 +134,6 @@ class Player:
         data = {}
         for attr_name, attr_values in self.__dict__.items():
             data[attr_name] = attr_values
-
-                    # self.data = {"identity": self.id,
-                    #  "name": self.name,
-                    #  "first_name": self.first_name,
-                    #  "dob": self.dob,
-                    #  "_genre": self._genre,
-                    #  "elo": self.elo,
-                    #  "score": self.point,
-                    #  "has_met": self.has_met,
-                    #  "status": self.status}
         return data
 
     @classmethod
@@ -151,10 +151,12 @@ class Player:
     @staticmethod
     def __player_db_acces():
         db = TinyDB('players.json')
-        return db.table('players')
+        db = db.table('players')
+        return db
 
 
 if __name__ == '__main__':
     Player.load_players()
     Player._list_all_player()
+    Player.save_all_players()
     print("heu....")
