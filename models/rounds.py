@@ -1,10 +1,10 @@
 # coding: utf-8
 
-import datetime as dt
+from datetime import datetime as dt
 from uuid import uuid4
 
-from models.players import Player
 from models.matchs import Match
+from models.players import Player
 
 
 class Round:
@@ -20,7 +20,7 @@ class Round:
         if isinstance(start_date, str) and start_date is not None:
             self.start = dt.datetime.fromisoformat(start_date)
         else:
-            self.start = start_date
+            self.start = dt.now().strftime("%Y-%m-%d %H:%M")
 
         if isinstance(end_date, str) and end_date is not None:
             self.end = dt.datetime.fromisoformat(end_date)
@@ -39,8 +39,7 @@ class Round:
         return self.name
 
     def new_round(self):
-        self.start = dt.datetime.now()
-        self.matches = self.define_matchs_in_round()
+        self.matches = self.__define_matchs_in_round()
 
     def end_round(self):
         """
@@ -56,7 +55,8 @@ class Round:
             players.sort(reverse=False, key=lambda x: (int(x.point), int(x.elo)))
         return players
 
-    def define_matchs_in_round(self) -> list:
+    def __define_matchs_in_round(self) -> list:
+
         if self.number == 1:
             """ Definition du premier tour"""
 

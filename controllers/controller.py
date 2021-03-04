@@ -1,82 +1,208 @@
 """Controller"""
 # coding:utf-8
+from typing import Union
 
-import re
-from datetime import datetime as dt
+from controllers.round_controller import *
 from models.players import Player
-from views.views import Display
+from models.rounds import Round
 from models.tournoi import Tournoi
-from controllers.round_controller import RoundController as rc
+from views.views import Display
 
 
-class Controller:
+
+class BaseController:
+    """
+    Base Class
+    """
+    def __init__(self):
+        self.control_tournament = None
+        self.view_menu = Display()
+        self.tournament = None
+        self.round = None
+
+    # --------------------------GENERAL METHODS------------------------------------
+
+    def ask_and_launch(self, ask_input="Votre choix : ", *, menu: dict):
+        """
+        Methode pour interagir avec l'utilisateur, contrôler sa réponse
+        et définir la suite des évènements. En fonction des menus qui lui sont
+        présenté.
+
+        Methode Arguments :
+        self : instance
+        ask_input : Texte qui sera demandé
+        menu : argument nommé qui contient un dictionnaire
+        dict{int(x):(tuple(Methode à lancer, Choix à afficher)}
+        """
+        user_input = input(ask_input)
+
+        if dict is not None:
+            menu_to_analyse = menu
+            try:
+                user_input = int(user_input)
+            except ValueError:
+                self.ask_and_launch(ask_input, menu=menu)
+
+            if self._check_choice(list(menu.keys()), user_input):
+                menu[user_input][0]()
+            else:
+                self.ask_and_launch(ask_input, menu=menu_to_analyse)
+
+    def _check_choice(self, menu: list, response: int) -> bool:
+        if response not in list(menu):
+            self.view_menu.error_msg("Choix incorrect !! Veuillez ressaisir")
+            self.input_press_continue()
+            return False
+        else:
+            return True
+
+    def ask_and_store_text(self, ask_input='Votre saisie : ') -> tuple[bool, str]:
+        user_input = input(ask_input)
+
+        if self._control_user_input('text', user_input):
+            return True, user_input
+        else:
+            return False, user_input
+
+    def ask_and_store_number(self, ask_input='Votre saisie : ') -> Union[tuple[bool, int], tuple[bool, str]]:
+        user_input = input(ask_input)
+
+        if self._control_user_input('number', user_input):
+            return True, int(user_input)
+        else:
+            return False, user_input
+
+    # -------------------------CONTROL METHODS---------------------------------
+
+    def _control_user_input(self, question, response) -> bool:
+        # Controle presence de chiffre dans le name/firstname
+        if question in ['name', 'first_name', 'text']:
+            if self.__check_number_in_word(response):
+                self.view_menu.error_msg('Saisi non valide !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+        if question == 'sentence':
+            if self.__check_sentence(response) < 2:
+                self.view_menu.error_msg('Saisie non valide !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+        elif question == 'dob':
+            # Controle le format de la date de naissance
+            try:
+                dt.strptime(response, '%d/%m/%Y')
+            except ValueError:
+                self.view_menu.error_msg('Veuillez saisir une date de naissance'
+                                         ' valide !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+        elif question == '_genre':
+            if response not in ['H', 'F']:
+                self.view_menu.error_msg('Genre saisi non valide !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+        elif question == 'bool':
+            if response not in ['O', 'N']:
+                self.view_menu.error_msg('Réponse non valide !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+        elif question == 'number':
+            try:
+                int(response)
+            except ValueError:
+                self.view_menu.error_msg('Veuillez saisir un nombre entier !\nVeuillez ressaisir !')
+                self.input_press_continue()
+                return False
+            else:
+                if int(response) < 0:
+                    self.view_menu.error_msg('Veuillez saisir un nombre entier !'
+                                             '\nVeuillez ressaisir !')
+                    self.input_press_continue()
+                    return False
+        return True
+
+    @staticmethod
+    def input_press_continue():
+        input("Pressez une touche pour continuer...")
+
+    @staticmethod
+    def __check_number_in_word(string):
+        """ Verification d'absence de chiffre dans
+         la variable passé en paramètre """
+        chiffre_pattern = re.compile('[0-9]')
+        return re.search(chiffre_pattern, string)
+
+    @staticmethod
+    def __check_sentence(string):
+        """ Verification d'absence de chiffre dans
+         la variable passé en paramètre """
+        sentence_pattern = re.compile('[a-z]+')
+        return len([*re.finditer(sentence_pattern, string)])
+
+
+class Controller(BaseController):
 
     def __init__(self):
+        super().__init__()
         Player.load_players()
-        self.control_tournament = ''
-        self.view_menu = Display()
-        self.control_round = ''
         self.menu_accueil()
 
     def menu_accueil(self):
-        self.view_menu.accueil()
-        menu = {1: self.menu_tournament,
-                2: self.menu_players,
-                3: self.menu_rapport,
-                4: exit}
+        title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
+        menu = {1: (self.menu_tournament, "Gestion tournoi"),
+                2: (self.menu_players, "Gestion des joueurs"),
+                3: (self.menu_rapport, "Affichage des rapports"),
+                4: (exit, "Sortie")}
 
-        response = self.c_input()
-        if self._check_choice(menu, response):
-            menu[int(response)]()
+        self.view_menu.display_menu(title=title, question=menu)
 
-        self.menu_accueil()
+        self.ask_and_launch(menu=menu)
 
     def menu_players(self):
-        self.view_menu.players()
-        menu = {1: self.add_player,
-                2: self.update_player_elo,
-                3: self.add_player_tournament,
-                4: self.remove_player_tournament,
-                5: Player.save_players,
-                6: self.menu_accueil}
+        title = "Bienvenue dans le gestionnaire de tournois d'échec."
+        subtitle = "Page de gestion des joueurs."
 
-        response = self.c_input()
-        if self._check_choice(menu, response):
-            menu[int(response)]()
+        menu = {1: (self.add_player, "Créer un joueur"),
+                2: (self.update_player_elo, "Modifier le classement ELO d'un joueur"),
+                3: (self.add_player_tournament, "Ajouter un joueur au tournoi actuel"),
+                4: (self.remove_player_tournament, "Supprimer un joueur du tournoi actuel"),
+                5: (Player.save_all_players, "Sauvegarder tous les joueurs"),
+                6: (self.menu_accueil, "Retour")}
 
-        self.menu_players()
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
+
+        self.ask_and_launch(menu=menu)
 
     def menu_tournament(self):
-        self.view_menu.tournament()
-        menu = {1: self.new_tournament,
-                2: self.load_tournament,
-                3: self.save_tournament,
-                4: self.call_round_controller,
-                5: self.menu_accueil}
+        title = "Bienvenue dans le gestionnaire de tournois d'échec."
+        subtitle = "Page de gestion du tournoi."
 
-        response = self.c_input()
-        if self._check_choice(menu, response):
-            menu[int(response)]()
+        menu = {1: (self.menu_param_tournament, "Configurer un nouveau tournoi"),
+                2: (self.load_tournament, "Charger un tournoi sauvegardé"),
+                3: (self.save_tournament, "Sauvegarder tournoi actuel"),
+                4: (self.rctournament, "Gestion des rounds"),
+                5: (self.menu_accueil, "Retour Accueil")}
 
-        self.menu_tournament()
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
+
+        self.ask_and_launch(menu=menu)
+
+
 
     def menu_rapport(self):
-        self.view_menu.rapport()
-        menu = {1: self.list_all_players,
-                2: self.list_tournament_players,
-                3: self.list_tournaments,
-                4: self.list_all_rounds,
-                5: self.list_all_matchs,
-                6: self.menu_accueil}
+        title = "Bienvenue dans le gestionnaire de tournois d'échec."
+        subtitle = "Page d'édition des rapports"
+        menu = {1: (self.list_all_players, "Liste de tous les joueurs"),
+                2: (self.list_tournament_players, "Liste de tous les joueurs d'un tournoi"),
+                3: (self.list_tournaments, "Liste de tous les tournois"),
+                4: (self.list_all_rounds, "Liste de tous les tours du tournoi"),
+                5: (self.list_all_matchs, "Liste de tous les matches du tournoi"),
+                6: (self.menu_accueil, "Retour")}
 
-        response = self.c_input()
-        if self._check_choice(menu, response):
-            menu[int(response)]()
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
-    def call_round_controller(self):
-        self.control_round = rc(Player.list_player_tournament(), self)
-        self.control_round.menu_round()
-# --------------------------_PLAYERS METHODS------------------------------------
+        self.ask_and_launch(menu=menu)
+
+    # --------------------------_PLAYERS METHODS------------------------------------
 
     def add_player(self):
         """
@@ -85,17 +211,38 @@ class Controller:
         Nom (name), Prénom (firstname), Date de Naissance (dob), sexe (_genre)
         Puis crée un nouveau joueur et sauvegarde la liste.
         """
+        title = "Bienvenue dans le gestionnaire de tournois d'échec.\nAjout d'un joueur"
+        subtitle = "Saisir dans l'ordre :\n"
+
+        menu = {1: ('', "Nom du joueur"),
+                2: ('', "Prénom du joueur"),
+                3: ('', "Date de naissance (Format dd/mm/aaaa)"),
+                4: ('', "Sexe (H/F)")}
+
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
+
         choice = ('name', 'first_name', 'dob', '_genre')
         response = []
-        menu = self.view_menu.add_player()
+
         for m in range(len(choice)):
-            res = self.c_input(menu[m][2:] + ' : ')
-            while not self._controle_data_input(choice[m], res):
-                res = self.c_input(menu[m][2:] + ' : ')
-            response.append(res)
+            if choice[m] in ['name', 'first_name']:
+                valid = self.ask_and_store_text(menu[m+1][1] + ' : ')
+                while not valid[0]:
+                    valid = self.ask_and_store_text(menu[m+1][1] + ' : ')
+                response.append(valid[1])
+            elif choice[m] == 'dob':
+                valid = input(menu[m+1][1] + ' : ')
+                while not self._control_user_input("dob", valid):
+                    valid = input(menu[m+1][1] + ' : ')
+                response.append(valid[1])
+            elif choice[m] == '_genre':
+                valid = input(menu[m+1][1] + ' : ')
+                while not self._control_user_input("_genre", valid):
+                    valid = input(menu[m+1][1] + ' : ')
+                response.append(valid)
             res = dict(zip(choice, response))
         Player(**res)
-        Player.save_players()
+        Player.save_all_players()
         self.menu_players()
 
     def update_player_elo(self):
@@ -107,11 +254,11 @@ class Controller:
         """
         player = self.found_specific_player()
         if player is not None:
-            res = self.c_input("Veuillez renseigner le nouveau ELO : ")
-            while not self._controle_data_input('elo', res):
-                res = self.c_input("Veuillez renseigner le nouveau ELO : ")
-            player.elo = res
-            Player.save_players()
+            valid = self.ask_and_store_number("Veuillez renseigner le nouveau ELO : ")
+            while not valid[0]:
+                valid = self.ask_and_store_number("Veuillez renseigner le nouveau ELO : ")
+            player.elo = valid[1]
+            Player.save_all_players()
 
     def add_player_tournament(self):
         """
@@ -122,17 +269,17 @@ class Controller:
         player = self.found_specific_player()
         if player is not None:
             if player.status:
-                Display.error_msg("Attention {} {} est déjà "
-                                  "inscrit au tournoi"
-                                  .format(player.name, player.first_name))
+                self.view_menu.error_msg("Attention {} {} est déjà "
+                                         "inscrit au tournoi"
+                                         .format(player.name, player.first_name))
             else:
-                res = self.c_input("Confirmez vous que {} {} "
-                                   "participe au tournoi ? "
-                                   "(O/N)".format(player.name,
-                                                  player.first_name))
-                if self._controle_data_input("bool", res):
+                valid = self.ask_and_store_text("Confirmez vous que {} {} "
+                                                "participe au tournoi ? "
+                                                "(O/N)".format(player.name,
+                                                               player.first_name))
+                if valid[0]:
                     player.switch_player_tournament()
-                    Player.save_players()
+                    player.update_player()
 
     def remove_player_tournament(self):
         """
@@ -143,100 +290,120 @@ class Controller:
         player = self.found_specific_player()
         if player is not None:
             if not player.status:
-                Display.error_msg("Attention {} {} est déjà "
-                                  "inscrit au tournoi"
-                                  .format(player.name, player.first_name))
+                self.view_menu.error_msg("Attention {} {} est déjà inscrit au "
+                                         "tournoi".format(player.name, player.first_name))
             else:
-                res = self.c_input("Confirmez vous que {} {} "
-                                   "participe plus au tournoi ? "
-                                   "(O/N)".format(player.name,
-                                                  player.first_name))
-                if self._controle_data_input("bool", res):
+                valid = self.ask_and_store_text("Confirmez vous que {} {} "
+                                                "participe plus au tournoi ? (O/N)"
+                                                .format(player.name, player.first_name))
+                if valid[0]:
                     player.switch_player_tournament()
-                    Player.save_players()
+                    Player.save_all_players()
 
-    def found_specific_player(self):
+    def found_specific_player(self) -> Player:
+        """
+        Methode qui va rechercher un joueur d'après son Nom et son prénom.
+        Renvoie un objet player
+        """
         search_question = ('Nom du joueur recherché : ',
                            'Prénom du joueur recherché : ')
         search_response = []
         for question in search_question:
-            res = self.c_input(question)
-            while not self._controle_data_input('text', res):
-                res = self.c_input(question)
-            search_response.append(res)
+            valid = self.ask_and_store_text(question)
+            while not valid[0]:
+                valid = self.ask_and_store_text(question)
+            search_response.append(valid[1])
 
         for player in Player._PLAYERS:
-            if player.name.upper() == search_response[0].upper() and\
+            if player.name.upper() == search_response[0].upper() and \
                     player.first_name.capitalize() == search_response[1].capitalize():
                 print(player)
                 return player
 
-        Display.error_msg("Joueur introuvable !\n"
-                          "Recherché à nouveau ou créer le joueur")
-        return None
+        self.view_menu.error_msg("Joueur introuvable !\n"
+                                 "Recherché à nouveau ou créer le joueur")
 
-# --------------------------TOURNAMENTS METHODS--------------------------------
+    # --------------------------TOURNAMENTS METHODS--------------------------------
 
-    def new_tournament(self):
-        info = {"Nom": Tournoi.NAME,
-                "Nombre de rounds": Tournoi.NB_ROUND,
-                "Règle de temps": Tournoi.TIMER,
-                "Description": Tournoi.DESCRIPTION,
-                "Initialiser le tournoi": "",
-                "Retour au menu": ""}
+    def menu_param_tournament(self):
+        """
+        Menu qui permet le paramétrage du tournoi.
+        """
+        title = "Bienvenue dans le gestionnaire de tournois d'échec."
+        subtitle = "Page de paramétrage du tournoi."
+        menu = {1: (self.change_name_tournament, f"Nom : {Tournoi.NAME}"),
+                2: (self.change_number_round_tournament, f"Nombre de rounds : {Tournoi.NB_ROUND}"),
+                3: (self.change_timer_rules, f"Règle de temps : {Tournoi.TIMER}"),
+                4: (self.change_location, f"Localisation : {Tournoi.LOCATION}"),
+                5: (self.add_description, f"Description : {Tournoi.DESCRIPTION}"),
+                6: (self.create_tournament, 'Initialiser un nouveau tournoi'),
+                7: (self.menu_accueil, 'Retour Accueil')}
 
-        choice = {1: self.change_name_tournament,
-                  2: self.change_number_round_tournament,
-                  3: self.change_timer_rules,
-                  4: self.add_description,
-                  5: self.create_tournament,
-                  6: self.menu_accueil
-                  }
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
-        Display.new_tournament(Display, **info)
-
-        response = self.c_input()
-
-        if self._check_choice(list(range(1, len(info) + 1)), response):
-            choice[int(response)]()
-
-        self.new_tournament()
+        self.ask_and_launch(menu=menu)
 
     def change_name_tournament(self):
-        response = self.c_input("Saisir le nom du tournoi : ")
-        if self._controle_data_input("sentence", response):
-            Tournoi.NAME = response
+        """
+        Methode qui change le nom du tournoi.
+        """
+        valid = self.ask_and_store_text('Saisir le nom du tournoi : ')
+        if valid[0]:
+            Tournoi.NAME = valid[1]
         else:
             self.change_name_tournament()
 
     def change_number_round_tournament(self):
-        response = self.c_input("Saisir le nombre de tours du tournoi : ")
-        if self._controle_data_input("number", response):
-            Tournoi.NB_ROUND = response
+        """
+        Methode qui change le nombre de rounds du tournoi.
+        """
+        valid = self.ask_and_store_number('Saisir le nombre de tours du tournoi : ')
+        if valid[0]:
+            Tournoi.NB_ROUND = valid[1]
         else:
             self.change_number_round_tournament()
 
     def change_timer_rules(self):
-        #TODO : Mettre en place l'input et le controle
+        # TODO : Mettre en place l'input et le controle
         pass
 
+    def change_location(self):
+        """
+        Methode qui change la localisation du tournoi.
+        """
+        valid = self.ask_and_store_text('Saisir la localisation du tournoi : ')
+        if valid[0]:
+            Tournoi.LOCATION = valid[1]
+        else:
+            self.change_location()
+
     def add_description(self):
-        response = self.c_input("Saisir la description du tournoi : ")
-        if self._controle_data_input("sentence", response):
-            Tournoi.DESCRIPTION = response
+        """
+        Methode qui ajoute une description au niveau du tournoi.
+        """
+        valid = input("Saisir la description du tournoi : ")
+        if self._control_user_input('sentence', valid):
+            Tournoi.DESCRIPTION = valid
         else:
             self.add_description()
 
     def create_tournament(self):
         self.control_tournament = Tournoi()
+        self.control_tournament.add_round(Round(round_number=1, players=Player.list_player_tournament()))
+        self.round = self.control_tournament.rounds[-1]
+        self.round.new_round()
+        self.rctournament()
+
+    def rctournament(self):
+        RoundController(self.control_tournament)
 
     def load_tournament(self):
         pass
 
     def save_tournament(self):
-        pass
+        self.control_tournament.save()
 
-# --------------------------RAPPORT METHODS------------------------------------
+    # --------------------------RAPPORT METHODS------------------------------------
 
     def list_all_players(self):
         """
@@ -245,6 +412,7 @@ class Controller:
         # TODO : A metre en forme et dans le module VUE
         response = Player._list_all_player()
         print(response)
+        return
 
     def list_tournament_players(self):
         """
@@ -253,6 +421,7 @@ class Controller:
         # TODO : A metre en forme et dans le module VUE
         response = Player.list_player_tournament()
         print(response)
+        return
 
     def list_tournaments(self):
         """
@@ -272,94 +441,7 @@ class Controller:
         """
         pass
 
-# --------------------------GENERAL METHODS------------------------------------
-    @staticmethod
-    def c_input(ask_input="Votre choix : "):
-        response = input(ask_input)
-        return response
-
-# -------------------------CONTROL METHODS-------------------------------------
-    def _controle_data_input(self, question, response) -> bool:
-        # Controle presence de chiffre dans le name/firstname
-        if question in ['name', 'first_name', 'text']:
-            if self.__check_number_in_word(response):
-                Display.error_msg('Nom/Prénom saisi non valide !'
-                                  '\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-        if question == 'sentence':
-            if self.__check_sentence(response) < 2:
-                Display.error_msg('Saisie non valide !'
-                                  '\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-        elif question == 'dob':
-            # Controle le format de la date de naissance
-            try:
-                dt.strptime(response, '%d/%m/%Y')
-            except ValueError:
-                Display.error_msg('Veuillez saisir une date de naissance'
-                                  ' valide !\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-        elif question == '_genre':
-            if response not in ['H', 'F']:
-                Display.error_msg('Genre saisi non valide !'
-                                  '\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-        elif question == 'bool':
-            if response not in ['O', 'N']:
-                Display.error_msg('Réponse non valide !'
-                                  '\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-        elif question == 'number':
-            try:
-                int(response)
-            except ValueError:
-                Display.error_msg('Veuillez saisir un nombre entier !'
-                                  '\nVeuillez resaissir !')
-                self.input_press_continue()
-                return False
-            else:
-                if int(response) < 0:
-                    Display.error_msg('Veuillez saisir un nombre entier !'
-                                      '\nVeuillez resaissir !')
-                    self.input_press_continue()
-                    return False
-        return True
-
-    def _check_choice(self, menu, response: int) -> bool:
-        if len(str(response)) != 1:
-            Display.error_msg("Choix incorrect. Un chiffre demandé."
-                              " Veuillez ressaisir !")
-            self.input_press_continue()
-            return False
-        elif int(response) not in list(menu):
-            Display.error_msg("Choix incorrect !! Veuillez ressaisir")
-            self.input_press_continue()
-            return False
-        else:
-            return True
-
-    def input_press_continue(self):
-        self.c_input("Pressez une touche pour continuer...")
-
-    @staticmethod
-    def __check_number_in_word(string):
-        """ Verification d'absence de chiffre dans
-         la variable passé en paramètre """
-        chiffre_pattern = re.compile('\d')
-        return re.search(chiffre_pattern, string)
-
-    @staticmethod
-    def __check_sentence(string):
-        """ Verification d'absence de chiffre dans
-         la variable passé en paramètre """
-        sentence_pattern = re.compile('[a-z]+')
-        return len([*re.finditer(sentence_pattern, string)])
-
 
 if __name__ == '__main__':
-    pass
+    while True:
+        main = Controller()

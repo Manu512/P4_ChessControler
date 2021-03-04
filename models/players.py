@@ -2,7 +2,7 @@
 from datetime import datetime as dt
 from uuid import uuid4
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 
 class Player:
@@ -18,8 +18,8 @@ class Player:
         self.first_name = kwargs['first_name']
         self.dob = kwargs['dob']
         self._genre = kwargs['_genre']
-        self.elo = kwargs['elo'] or 0
-        self.point = kwargs['point'] or 0
+        self.elo = 0
+        self.point = 0
         self.has_met = []
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
@@ -74,9 +74,11 @@ class Player:
 
     def win(self):
         self.point += 1
+        self.update_player()
 
     def equality(self):
         self.point += 0.5
+        self.update_player()
 
     def add_meet(self, player: str):
         self.has_met.append(player)
@@ -93,6 +95,7 @@ class Player:
 
         p = []
         Player._NB_ACTIVE_PLAYERS = len([p.append(player) for player in Player._PLAYERS if player.status])
+        self.update_player()
 
     @classmethod
     def isactiveplayerlistpair(cls):
@@ -111,7 +114,7 @@ class Player:
         return var
 
     @classmethod
-    def list_player_tournament(cls):
+    def list_player_tournament(cls) -> list:
         var = [player for player in cls._PLAYERS if player.status]
         cls._NB_ACTIVE_PLAYERS = len(var)
         return var

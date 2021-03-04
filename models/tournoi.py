@@ -18,8 +18,9 @@ class Tournoi:
     NB_DEFAULT_PLAYERS = 8
     TIMER = "Bullet"
     DESCRIPTION = ""
+    LOCATION = 'France'
 
-    def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = "En France",
+    def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = None,
                  tournament_date: str = None, description: str = None,
                  timer: str = TIMER, rounds: list[Round] = None, rounds_number: int = None):
 
@@ -27,14 +28,25 @@ class Tournoi:
             self.id = identity
         else:
             self.id = str(uuid4())
+
         self.name = name
-        self.location = location
-        if isinstance(tournament_date, str):
+
+        if isinstance(location, str) and location is not None:
+            self.location = location
+        else:
+            self.location = self.LOCATION
+
+        if isinstance(tournament_date, str) and tournament_date is not None:
             self.tournament_date = tournament_date
         else:
             self.tournament_date = dt.now().date().strftime("%Y-%m-%d")
+
         self.timer = timer
-        self. description = description
+
+        if isinstance(description, str) and description is not None:
+            self.description = description
+        else:
+            self.description = self.DESCRIPTION
         self.rounds = []
 
         if rounds_number:

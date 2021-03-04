@@ -1,7 +1,7 @@
 # coding: utf-8
 
 import logging
-from controllers.controller import Controller
+from controllers.control import Main_Controler
 
 
 logging.basicConfig(level=logging.INFO)
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == '__main__':
     try:
         while True:
-            tournament = Controller()
+            tournament = Main_Controler()
     except Exception as e:
         logging.error(f"Problem with execution. Msg : {e}")
     finally:
