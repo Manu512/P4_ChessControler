@@ -3,106 +3,90 @@
 from datetime import datetime as dt
 from uuid import uuid4
 
+from tinydb import Query, TinyDB
+
+from models.rounds import Round
+
 
 class Tournoi:
+
+    db = TinyDB('tournament.json')
+    table_tournoi = db.table('tournament')
+
     NAME = "Tournoi d'échec"
     NB_ROUND = 4
+    NB_DEFAULT_PLAYERS = 8
     TIMER = "Bullet"
     DESCRIPTION = ""
 
-    def __init__(self, **kwargs):
-        """
+    def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = "En France",
+                 tournament_date: str = None, description: str = None,
+                 timer: str = TIMER, rounds: list[Round] = None, rounds_number: int = None):
 
-        :param name: Nom du tournoi
-        :type name: str
-        :param int nb_round: Nombre de tour
-        :type nb_round: int
-        :param timer: Contrôle du temps (Bullet, Blitz, Coup Rapide)
-        :type timer: int
-        """
-        self.id = str(uuid4())
-        self.name = self.NAME
-        self.date = dt.today()
-        self.nb_round = self.NB_ROUND
+        if isinstance(identity, str) and identity is not None:
+            self.id = identity
+        else:
+            self.id = str(uuid4())
+        self.name = name
+        self.location = location
+        if isinstance(tournament_date, str):
+            self.tournament_date = tournament_date
+        else:
+            self.tournament_date = dt.now().date().strftime("%Y-%m-%d")
+        self.timer = timer
+        self. description = description
         self.rounds = []
-        self.players = []
-        self.timer = self.TIMER
-        self.Description = self.DESCRIPTION
-        for attr_name, attr_value in kwargs.items():
-            setattr(self, attr_name, attr_value)
 
-    def __repr__(self):
-        return self.name + " - " + self.rounds[-1].name
+        if rounds_number:
+            self.rounds_number = rounds_number
+        else:
+            self.rounds_number = self.NB_ROUND
 
-    def add_round(self):
-        self.rounds.append(round())
-        return
-
-    def start(self):
-        """D"""
-        pass
+        if rounds:
+            for data in rounds:
+                round = Round(**data)
+                self.rounds.append(round)
 
     def save(self):
-        """D"""
-        pass
+        """ Methode de sauvegarde des données au format JSON avec TinyDB"""
+        q = Query()
 
-    def load(self):
-        """D Methode permettant de reprendre une partie sauvegarder"""
+        data = {}
+        for attr_name, attr_value in self.__dict__.items():
+            data[attr_name]= attr_value
+
+        store_rounds = []
+        for round in self.rounds:
+            """ On parcours tous les rounds ayant été initialisés"""
+            store_matches = []
+            for match in round.matches:
+                """ On parcours les matchs dans le round"""
+                store_matches.append(match)
+            store_rounds.append(round)
+
+        self.table_tournoi.upsert(data, q.id == self.id)
+        return self
+
+    def __repr__(self):
+        return self.name + " - " + self.id
+
+    def add_round(self, round):
+        self.rounds.append(round)
+        return
 
     @property
     def current_round(self):
         return self.rounds[-1].name
 
-# --------------------------TinyDB parts---------------------------------------
-
-    def save_tournament(self):
-        """
-        Methode de classe permettant de sauvegarder l'ensemble des joueurs.
-        Class method allowing all players to be saved.
-        """
-        tournament_db = cls.__tournament_db_acces()
-        # tournament_db.truncate()
-        serialized_tournament = self.__serialize_tournament()
-        tournament_db.insert(serialized_tournament)
-
-    def __serialize_tournament(self):
-        self.data = {"_id": self._id,
-                     "name": self.name,
-                     "first_name": self.first_name,
-                     "dob": self.dob,
-                     "_genre": self._genre,
-                     "elo": self.elo,
-                     "score": self.point,
-                     "has_met": self.versus,
-                     "status": self.status}
-        return self.data
 
     @classmethod
     def load_tournament(cls):
+        # TODO A faire
         """
         Methode de classe permettant de charger l'ensemble des joueurs connus.
 
 
         Class method allowing all players to be loaded.
         """
-        tournament_db = cls.__tournament_db_acces()
         serialized_tournament_data = tournament_db.all()
         [Tournoi(**data) for data in serialized_tournament_data]
-
-    @staticmethod
-    def __tournament_db_acces():
-        db = TinyDB('tournament.json')
-        return db.table('tournament')
-
-
-if __name__ == '__main__':
-
-    echec = Tournoi()
-    echec.add_round()
-
-    round = {'player_a': 'WALDNER', 'player_b': 'BREDERECK', 'score_a': 1, 'score_b': 0}
-    m = Match(**round)
-    print(m)
-    t = Tour()
-    t.add_match(m)
-    print(t)

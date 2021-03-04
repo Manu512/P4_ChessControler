@@ -1,6 +1,7 @@
 # coding: utf-8
-from tinydb import TinyDB
 from datetime import datetime as dt
+
+from tinydb import TinyDB
 
 
 class Player:
@@ -21,20 +22,14 @@ class Player:
         self.has_met = []
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
-        self._id = Player._NB_PLAYER
+        self.id = Player._NB_PLAYER
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
         Player._PLAYERS.append(self)
 
     def __repr__(self):
-        return "{} {} - ELO : {} " \
-               "- Pts : {} " \
-               "- Engagé : {}".format(self.name,
-                                      self.first_name,
-                                      self.elo,
-                                      self.point,
-                                      self.status)
+        return "{} - ELO : {} - Pts : {} ".format(self.fullname, self.elo, self.point)
 
     @property
     def age(self) -> int:
@@ -46,6 +41,10 @@ class Player:
         today = dt.today()
         return today.year - birth.year - (
                     (today.month, today.day) < (birth.month, birth.day))
+
+    @property
+    def fullname(self):
+        return f"{self.name} {self.first_name}"
 
     @property
     def sexe(self) -> str:
@@ -64,10 +63,10 @@ class Player:
         """
         self.elo = new_classement
 
-    def win_round(self):
+    def win(self):
         self.point += 1
 
-    def equality_round(self):
+    def equality(self):
         self.point += 0.5
 
     def add_meet(self, player: str):
@@ -98,7 +97,8 @@ class Player:
 
     @classmethod
     def _list_all_player(cls):
-        [print(player) for player in cls._PLAYERS]
+        var = [player for player in cls._PLAYERS]
+        return var
 
     @classmethod
     def list_player_tournament(cls):
@@ -121,16 +121,20 @@ class Player:
         players_db.insert_multiple(serialized_players)
 
     def __serialize_player(self):
-        self.data = {"_id": self._id,
-                     "name": self.name,
-                     "first_name": self.first_name,
-                     "dob": self.dob,
-                     "_genre": self._genre,
-                     "elo": self.elo,
-                     "score": self.point,
-                     "has_met": self.has_met,
-                     "status": self.status}
-        return self.data
+        data = {}
+        for attr_name, attr_values in self.__dict__.items():
+            data[attr_name] = attr_values
+
+                    # self.data = {"identity": self.id,
+                    #  "name": self.name,
+                    #  "first_name": self.first_name,
+                    #  "dob": self.dob,
+                    #  "_genre": self._genre,
+                    #  "elo": self.elo,
+                    #  "score": self.point,
+                    #  "has_met": self.has_met,
+                    #  "status": self.status}
+        return data
 
     @classmethod
     def load_players(cls):

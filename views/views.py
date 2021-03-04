@@ -53,7 +53,8 @@ class Display:
                 "2": "Modifier le classement ELO d'un joueur",
                 "3": "Ajouter un joueur au tournoi actuel",
                 "4": "Supprimer un joueur du tournoi actuel",
-                "5": "Retour"}
+                "5": "Sauvegarder les joueurs",
+                "6": "Retour"}
 
         self.view_menu(menu)
         return menu
@@ -67,7 +68,7 @@ class Display:
                 "2": "Liste de tous les joueurs d'un tournoi",
                 "3": "Liste de tous les tournois",
                 "4": "Liste de tous les tours du tournoi",
-                "5": "Liste de tous les matchs du tournoi",
+                "5": "Liste de tous les matches du tournoi",
                 "6": "Retour"}
 
         self.view_menu(menu)
@@ -109,7 +110,55 @@ class Display:
         self.view_menu(menu)
         return menu
 
-# -----------------------------------------------------------------------------
+# -----------------------SubMenu Round ---------------------------------------
+
+    def view_matchs(self, rounds):
+        self.clean
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
+              f"Matchs du rounds {rounds.name}")
+        print("Les rencontres : \n")
+        for match in rounds.matches:
+            if match.score:
+                print("\t{} : {} vs {} : {}".format(match.players[0].fullname,
+                                                    match.score[0],
+                                                    match.players[1].fullname,
+                                                    match.score[1]))
+            else:
+                print("\t{} vs {} : En attente du résultat".format(match.players[0].fullname,
+                                                                   match.players[1].fullname))
+        print("\n"*5)
+
+    def select_match(self, rounds):
+        self.clean()
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
+              f"Matchs du rounds {rounds.name}")
+        print("Selection de la rencontre : \n")
+        for nb, match in enumerate(rounds.matches):
+            if match.score:
+                print("\t{} - {} : {} vs {} : {}".format(nb + 1, match.players[0].fullname,
+                                                    match.score[0],
+                                                    match.players[1].fullname,
+                                                    match.score[1]))
+            else:
+                print("\t{} - {} vs {} : En attente du résultat".format(nb + 1, match.players[0].fullname,
+                                                                   match.players[1].fullname))
+
+
+        print("\n" * 5)
+
+    def select_winner(self, match):
+        self.clean()
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
+              f"Matchs opposant :{match.players[0].fullname} à {match.players[1].fullname}")
+        print("Selection du vainqueur : \n")
+
+        print(f"\t1 : {match.players[0].fullname}")
+        print(f"\t2 : {match.players[1].fullname}")
+        print(f"\t3 : En cas d'égalité")
+
+
+
+        print("\n" * 5)
 
     @staticmethod
     def error_msg(msg):

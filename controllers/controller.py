@@ -6,7 +6,6 @@ from datetime import datetime as dt
 from models.players import Player
 from views.views import Display
 from models.tournoi import Tournoi
-from models.rounds import Round
 from controllers.round_controller import RoundController as rc
 
 
@@ -16,6 +15,7 @@ class Controller:
         Player.load_players()
         self.control_tournament = ''
         self.view_menu = Display()
+        self.control_round = ''
         self.menu_accueil()
 
     def menu_accueil(self):
@@ -37,7 +37,8 @@ class Controller:
                 2: self.update_player_elo,
                 3: self.add_player_tournament,
                 4: self.remove_player_tournament,
-                5: self.menu_accueil}
+                5: Player.save_players,
+                6: self.menu_accueil}
 
         response = self.c_input()
         if self._check_choice(menu, response):
@@ -73,8 +74,8 @@ class Controller:
             menu[int(response)]()
 
     def call_round_controller(self):
-        rc(Player.list_player_tournament(), self),
-
+        self.control_round = rc(Player.list_player_tournament(), self)
+        self.control_round.menu_round()
 # --------------------------_PLAYERS METHODS------------------------------------
 
     def add_player(self):
@@ -235,43 +236,23 @@ class Controller:
     def save_tournament(self):
         pass
 
-# -------------------------- Round -------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # --------------------------RAPPORT METHODS------------------------------------
 
     def list_all_players(self):
         """
         Fonction qui va lancer le print de la liste des joueurs connus
         """
-        Player._list_all_player()
+        # TODO : A metre en forme et dans le module VUE
+        response = Player._list_all_player()
+        print(response)
 
     def list_tournament_players(self):
         """
         Fonction qui va lancer le print de la liste des joueurs du tournois
         """
-        Player.list_player_tournament()
+        # TODO : A metre en forme et dans le module VUE
+        response = Player.list_player_tournament()
+        print(response)
 
     def list_tournaments(self):
         """
@@ -287,7 +268,7 @@ class Controller:
 
     def list_all_matchs(self):
         """
-        Fonction qui va lancer le print de la liste des matchs du tournois
+        Fonction qui va lancer le print de la liste des matches du tournois
         """
         pass
 
@@ -381,14 +362,4 @@ class Controller:
 
 
 if __name__ == '__main__':
-    d = Controller()
-    player_activ = Player.list_player_tournament()
-    r = Round(player_activ)
-    match = r.define_matchs_in_round()
-    print(match)
-
-    r2 = Round(player_activ)
-    match = r.define_matchs_in_round()
-    print(match)
-
-
+    pass
