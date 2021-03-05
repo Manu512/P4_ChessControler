@@ -82,7 +82,7 @@ class Display:
     def select_match(self, rounds):
         self.clean()
         print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
-              f"Matchs du rounds {rounds.name}")
+              f"Matchs du rounds {rounds.number}")
         print("Selection de la rencontre : \n")
         for nb, match in enumerate(rounds.matches):
             if match.score:
@@ -100,8 +100,8 @@ class Display:
     def select_winner(self, match):
         self.clean()
         print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
-              f"Matchs opposant :{match.players[0].fullname} à {match.players[1].fullname}")
-        print("Selection du vainqueur : \n")
+              f"Matchs opposant : {match.players[0].fullname} à {match.players[1].fullname}")
+        print("\n\tSelection du vainqueur : \n")
 
         print(f"\t1 : {match.players[0].fullname}")
         print(f"\t2 : {match.players[1].fullname}")

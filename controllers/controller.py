@@ -143,8 +143,6 @@ class Controller(BaseController):
 
     def __init__(self):
         super().__init__()
-        Player.load_players()
-        self.menu_accueil()
 
     def menu_accueil(self):
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
@@ -185,8 +183,6 @@ class Controller(BaseController):
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         self.ask_and_launch(menu=menu)
-
-
 
     def menu_rapport(self):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
@@ -395,7 +391,11 @@ class Controller(BaseController):
         self.rctournament()
 
     def rctournament(self):
-        RoundController(self.control_tournament)
+        try:
+            RoundController(self.control_tournament)
+        except AttributeError:
+            self.view_menu.error_msg("Commençons par initialiser le tournoi !")
+            self.menu_param_tournament()
 
     def load_tournament(self):
         pass
@@ -443,5 +443,7 @@ class Controller(BaseController):
 
 
 if __name__ == '__main__':
+    Player.load_players()
+    main = Controller()
     while True:
-        main = Controller()
+        main.menu_accueil()

@@ -23,11 +23,14 @@ class RoundController(BaseController):
                 4: (self.list_round_matchs, 'Consulter les matches en cours'),
                 5: (self.add_score, f"Saisir les scores du Round {self.round.number}"),
                 6: (self.start_new_round, 'Démarrer nouveau Round'),
-                7: (Controller.menu_tournament, 'Retour au menu')}
+                7: (self.back_menu, 'Retour au menu')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         self.ask_and_launch(menu=menu)
+
+    def back_menu(self):
+        return self
 
     def list_round_matchs(self):
         if self.round.number != 0:
@@ -40,18 +43,20 @@ class RoundController(BaseController):
 
     def add_score(self):
         if self.round.number != 0:
-            self.view_menu.select_match(self.round.matches[-1])
-            response = self.ask_and_launch("Choisissez le match pour renseigner le résultat :")
-
-            if self.check_match_choice(response):
-                match_played = self.round.matches[int(response) - 1]
+            self.view_menu.select_match(self.round)
+            response = self.ask_and_store_number("Choisissez le match pour renseigner le résultat :")
+            """
+            response = tuple(False/True if valid input, input value)
+            """
+            if response[0]:
+                match_played = self.round.matches[response[1]]
                 self.view_menu.select_winner(match_played)
-                response = self.ask_and_launch()
+                response = self.ask_and_store_number()
 
-                if int(response) in [1, 2]:
-                    match_played.players[int(response) - 1].win()
-                    match_played.win(match_played.players[int(response) - 1])
-                    print(f"Le gagnant est !!!! {match_played.players[int(response) - 1]}")
+                if response[1] in [1, 2]:
+                    match_played.players[response[1]-1].win()
+                    match_played.win(match_played.players[response[1]-1])
+                    print(f"Le gagnant est !!!! {match_played.players[response[1]-1]}")
                 else:
                     match_played.players[0].equality()
                     match_played.players[1].equality()

@@ -45,7 +45,7 @@ class Round:
         """
         Method called at end of rounds
         """
-        self.end = dt.datetime.now()
+        self.end = dt.now().strftime("%Y-%m-%d %H:%M")
 
     @staticmethod
     def sort_player(players: list[Player], reversed=True) -> list:
