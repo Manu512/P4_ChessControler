@@ -1,5 +1,8 @@
 """Controller"""
 # coding:utf-8
+
+import re
+
 from typing import Union
 
 from controllers.round_controller import *
@@ -9,13 +12,11 @@ from models.tournoi import Tournoi
 from views.views import Display
 
 
-
 class BaseController:
     """
     Base Class
     """
     def __init__(self):
-        self.control_tournament = None
         self.view_menu = Display()
         self.tournament = None
         self.round = None
@@ -177,7 +178,7 @@ class Controller(BaseController):
         menu = {1: (self.menu_param_tournament, "Configurer un nouveau tournoi"),
                 2: (self.load_tournament, "Charger un tournoi sauvegardé"),
                 3: (self.save_tournament, "Sauvegarder tournoi actuel"),
-                4: (self.rctournament, "Gestion des rounds"),
+                4: (self.switch_rctournament, "Gestion des rounds"),
                 5: (self.menu_accueil, "Retour Accueil")}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
@@ -253,7 +254,7 @@ class Controller(BaseController):
             valid = self.ask_and_store_number("Veuillez renseigner le nouveau ELO : ")
             while not valid[0]:
                 valid = self.ask_and_store_number("Veuillez renseigner le nouveau ELO : ")
-            player.elo = valid[1]
+            player.update_classement(valid[1])
             Player.save_all_players()
 
     def add_player_tournament(self):
@@ -384,15 +385,15 @@ class Controller(BaseController):
             self.add_description()
 
     def create_tournament(self):
-        self.control_tournament = Tournoi()
-        self.control_tournament.add_round(Round(round_number=1, players=Player.list_player_tournament()))
-        self.round = self.control_tournament.rounds[-1]
+        self.tournament = Tournoi()
+        self.tournament.add_round(Round(round_number=1, players=Player.list_player_tournament()))
+        self.round = self.tournament.rounds[-1]
         self.round.new_round()
-        self.rctournament()
+        self.switch_rctournament()
 
-    def rctournament(self):
+    def switch_rctournament(self):
         try:
-            RoundController(self.control_tournament)
+            RoundController(self.tournament)
         except AttributeError:
             self.view_menu.error_msg("Commençons par initialiser le tournoi !")
             self.menu_param_tournament()
@@ -401,7 +402,7 @@ class Controller(BaseController):
         pass
 
     def save_tournament(self):
-        self.control_tournament.save()
+        self.tournament.save()
 
     # --------------------------RAPPORT METHODS------------------------------------
 

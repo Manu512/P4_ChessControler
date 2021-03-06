@@ -49,7 +49,7 @@ class RoundController(BaseController):
             response = tuple(False/True if valid input, input value)
             """
             if response[0]:
-                match_played = self.round.matches[response[1]]
+                match_played = self.round.matches[response[1]-1]
                 self.view_menu.select_winner(match_played)
                 response = self.ask_and_store_number()
 
@@ -61,12 +61,10 @@ class RoundController(BaseController):
                     match_played.players[0].equality()
                     match_played.players[1].equality()
                     match_played.win()
-                    print(f"Equality !!!!!")
-
-                match_played.players[0].add_meet(match_played.players[1].uuid)
-                match_played.players[1].add_meet(match_played.players[0].uuid)
-
-                return
+                    print("Equality !!!!!")
+                match_played.players[0].add_meet(match_played.players[1]._uuid)
+                match_played.players[1].add_meet(match_played.players[0]._uuid)
+                self.menu_round()
 
         else:
             self.view_menu.error_msg("Commencer par démarrer un round !!!!")
@@ -77,7 +75,9 @@ class RoundController(BaseController):
             self.view_menu.error_msg("Attention, le précédent round n'est pas fini !")
             self.input_press_continue()
         else:
-            self.round.new_round()
+            self.round = self.tournament.add_round(Round(round_number=self.round.number + 1,
+                                                         players=Player.list_player_tournament()))
+        self.menu_round()
 
     def stop_round(self):
         if self.round.start != "":
@@ -86,15 +86,4 @@ class RoundController(BaseController):
             self.view_menu.error_msg("Commencer par démarrer un round !!!!")
             self.input_press_continue()
 
-    def check_match_choice(self, response: int) -> bool:
-        if len(str(response)) != 1:
-            self.view_menu.error_msg("Choix incorrect. Un chiffre demandé."
-                                     " Veuillez ressaisir !")
-            self.input_press_continue()
-            return False
-        elif int(response) not in [1, 2, 3, 4]:
-            self.view_menu.error_msg("Choix incorrect !! Veuillez ressaisir")
-            self.input_press_continue()
-            return False
-        else:
-            return True
+        self.menu_round()

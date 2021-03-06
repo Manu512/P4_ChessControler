@@ -65,7 +65,7 @@ class Tournoi:
 
         data = {}
         for attr_name, attr_value in self.__dict__.items():
-            data[attr_name]= attr_value
+            data[attr_name] = attr_value
 
         store_rounds = []
         for round in self.rounds:
@@ -90,15 +90,13 @@ class Tournoi:
     def current_round(self):
         return self.rounds[-1].name
 
-
     @classmethod
     def load_tournament(cls):
         # TODO A faire
         """
         Methode de classe permettant de charger l'ensemble des joueurs connus.
 
-
         Class method allowing all players to be loaded.
         """
-        serialized_tournament_data = tournament_db.all()
+        serialized_tournament_data = cls.table_tournoi.all()
         [Tournoi(**data) for data in serialized_tournament_data]

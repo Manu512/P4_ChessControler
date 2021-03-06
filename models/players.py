@@ -24,7 +24,7 @@ class Player:
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
         self.id = Player._NB_PLAYER
-        self.__uuid = str(uuid4())
+        self._uuid = str(uuid4())
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
@@ -37,7 +37,7 @@ class Player:
         q = Query()
         players_table = self.__player_db_acces()
         player_data = self.__serialize_player()
-        players_table.upsert(player_data, q._Player__uuid == self.__uuid)
+        players_table.upsert(player_data, q._uuid == self._uuid)
 
     @property
     def age(self) -> int:

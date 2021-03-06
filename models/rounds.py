@@ -16,14 +16,18 @@ class Round:
         self.id = str(uuid4())
         self.number = round_number
         self.name = 'Round {}'.format(self.number)
+        if isinstance(matches, list[Match]) and matches is not None:
+            self.matches = matches
+        else:
+            self.matches = self.__define_matchs_in_round()
 
         if isinstance(start_date, str) and start_date is not None:
-            self.start = dt.datetime.fromisoformat(start_date)
+            self.start = dt.fromisoformat(start_date)
         else:
             self.start = dt.now().strftime("%Y-%m-%d %H:%M")
 
         if isinstance(end_date, str) and end_date is not None:
-            self.end = dt.datetime.fromisoformat(end_date)
+            self.end = dt.fromisoformat(end_date)
         else:
             self.end = end_date
 
@@ -38,9 +42,6 @@ class Round:
     def __repr__(self):
         return self.name
 
-    def new_round(self):
-        self.matches = self.__define_matchs_in_round()
-
     def end_round(self):
         """
         Method called at end of rounds
@@ -48,8 +49,8 @@ class Round:
         self.end = dt.now().strftime("%Y-%m-%d %H:%M")
 
     @staticmethod
-    def sort_player(players: list[Player], reversed=True) -> list:
-        if reversed:
+    def sort_player(players: list[Player], reverse=True) -> list:
+        if reverse:
             players.sort(reverse=True, key=lambda x: (int(x.point), int(x.elo)))
         else:
             players.sort(reverse=False, key=lambda x: (int(x.point), int(x.elo)))
@@ -98,9 +99,18 @@ class Round:
             while len(free_players):
                 player1 = free_players.pop()
 
-                x = -1
-                while free_players[x].id in player1.has_met:
-                    x -= 1
-                player2 = free_players.pop(x)
+                available_opponent = free_players.copy()
+
+                player_to_remove = []
+                for opponent_player in available_opponent:
+                    if opponent_player._uuid in player1.has_met:
+                        player_to_remove.append(opponent_player)
+
+                for each_player in player_to_remove:
+                    available_opponent.remove(each_player)
+
+                player2 = free_players.pop()
+
                 other_round.append(Match([player1, player2]))
+
             return other_round
