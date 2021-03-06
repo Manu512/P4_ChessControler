@@ -386,9 +386,8 @@ class Controller(BaseController):
 
     def create_tournament(self):
         self.tournament = Tournoi()
-        self.tournament.add_round(Round(round_number=1, players=Player.list_player_tournament()))
+        self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
-        self.round.new_round()
         self.switch_rctournament()
 
     def switch_rctournament(self):
@@ -406,12 +405,13 @@ class Controller(BaseController):
 
     # --------------------------RAPPORT METHODS------------------------------------
 
+    @staticmethod
     def list_all_players(self):
         """
         Fonction qui va lancer le print de la liste des joueurs connus
         """
         # TODO : A metre en forme et dans le module VUE
-        response = Player._list_all_player()
+        response = self._list_all_player()
         print(response)
         return
 

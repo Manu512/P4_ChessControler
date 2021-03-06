@@ -20,11 +20,11 @@ class Player:
         self._genre = kwargs['_genre']
         self.elo = 0
         self.point = 0
-        self.has_met = []
+        self.has_met = set()       # passage list -> set pour eviter les doublons
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
         self.id = Player._NB_PLAYER
-        self._uuid = str(uuid4())
+        self.uuid = str(uuid4())
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
@@ -37,7 +37,7 @@ class Player:
         q = Query()
         players_table = self.__player_db_acces()
         player_data = self.__serialize_player()
-        players_table.upsert(player_data, q._uuid == self._uuid)
+        players_table.upsert(player_data, q.uuid == self.uuid)
 
     @property
     def age(self) -> int:
@@ -81,7 +81,7 @@ class Player:
         self.update_player()
 
     def add_meet(self, player: str):
-        self.has_met.append(player)
+        self.has_met.add(player)
         self.update_player()
 
     def switch_player_tournament(self):
@@ -109,6 +109,36 @@ class Player:
             return True                  # Paire
 
     @classmethod
+    def initialise_point_meeting(cls):
+        """ Class method call for initialize Tournament and reset old point and meet between players."""
+        p = [player for player in cls._PLAYERS if player.point != 0]
+
+        for player in p:
+            player.point = 0
+
+        p = [player for player in cls._PLAYERS if len(player.has_met) ]
+
+        for player in p:
+            player.has_met = set()
+
+        cls.save_all_players()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @classmethod
     def _list_all_player(cls):
         var = [player for player in cls._PLAYERS]
         return var
@@ -120,7 +150,6 @@ class Player:
         return var
 
 # --------------------------TinyDB parts---------------------------------------
-
     @classmethod
     def save_all_players(cls):
         """
@@ -161,5 +190,5 @@ class Player:
 if __name__ == '__main__':
     Player.load_players()
     Player._list_all_player()
-    Player.save_all_players()
     print("heu....")
+    Player.initialise_point_meeting()

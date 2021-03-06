@@ -6,6 +6,7 @@ from uuid import uuid4
 from tinydb import Query, TinyDB
 
 from models.rounds import Round
+from models.players import Player
 
 
 class Tournoi:
@@ -52,7 +53,7 @@ class Tournoi:
         if rounds_number:
             self.rounds_number = rounds_number
         else:
-            self.rounds_number = self.NB_ROUND
+            self.rounds_number = 0
 
         if rounds:
             for data in rounds:
@@ -82,8 +83,11 @@ class Tournoi:
     def __repr__(self):
         return self.name + " - " + self.id
 
-    def add_round(self, round):
-        self.rounds.append(round)
+    def add_round(self):
+        player = Player.list_player_tournament()
+        r = Round(round_number=self.rounds_number + 1, players=player)
+        self.rounds.append(r)
+        self.rounds_number += 1
         return
 
     @property

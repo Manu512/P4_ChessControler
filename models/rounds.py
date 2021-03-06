@@ -16,10 +16,6 @@ class Round:
         self.id = str(uuid4())
         self.number = round_number
         self.name = 'Round {}'.format(self.number)
-        if isinstance(matches, list[Match]) and matches is not None:
-            self.matches = matches
-        else:
-            self.matches = self.__define_matchs_in_round()
 
         if isinstance(start_date, str) and start_date is not None:
             self.start = dt.fromisoformat(start_date)
@@ -38,6 +34,12 @@ class Round:
             self.matches = []
 
         self.players = players
+
+        if isinstance(matches, list) and matches is not None:
+            self.matches = matches
+        else:
+            self.matches = self.__define_matchs_in_round()
+
 
     def __repr__(self):
         return self.name
@@ -103,13 +105,13 @@ class Round:
 
                 player_to_remove = []
                 for opponent_player in available_opponent:
-                    if opponent_player._uuid in player1.has_met:
+                    if opponent_player.uuid in player1.has_met:
                         player_to_remove.append(opponent_player)
 
                 for each_player in player_to_remove:
                     available_opponent.remove(each_player)
 
-                player2 = free_players.pop()
+                player2 = available_opponent.pop()
 
                 other_round.append(Match([player1, player2]))
 

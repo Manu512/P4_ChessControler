@@ -62,8 +62,8 @@ class RoundController(BaseController):
                     match_played.players[1].equality()
                     match_played.win()
                     print("Equality !!!!!")
-                match_played.players[0].add_meet(match_played.players[1]._uuid)
-                match_played.players[1].add_meet(match_played.players[0]._uuid)
+                match_played.players[0].add_meet(match_played.players[1].uuid)
+                match_played.players[1].add_meet(match_played.players[0].uuid)
                 self.menu_round()
 
         else:
@@ -75,9 +75,8 @@ class RoundController(BaseController):
             self.view_menu.error_msg("Attention, le précédent round n'est pas fini !")
             self.input_press_continue()
         else:
-            self.round = self.tournament.add_round(Round(round_number=self.round.number + 1,
-                                                         players=Player.list_player_tournament()))
-        self.menu_round()
+            self.tournament.add_round()
+            self.round = self.tournament.rounds[-1]
 
     def stop_round(self):
         if self.round.start != "":
