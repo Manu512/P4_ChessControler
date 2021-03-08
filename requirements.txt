@@ -1,1 +1,2 @@
 TinyDB~=4.4.0
+jsonpickle

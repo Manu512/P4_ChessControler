@@ -1,9 +1,10 @@
 # coding: utf-8
-
+import json
 from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
+import pickle
 
 from models.rounds import Round
 from models.players import Player
@@ -11,8 +12,8 @@ from models.players import Player
 
 class Tournoi:
 
-    db = TinyDB('tournament.json')
-    table_tournoi = db.table('tournament')
+    __db = TinyDB('tournament.json')
+    table_tournoi = __db.table('tournament')
 
     NAME = "Tournoi d'échec"
     NB_ROUND = 4
@@ -64,24 +65,33 @@ class Tournoi:
         """ Methode de sauvegarde des données au format JSON avec TinyDB"""
         q = Query()
 
-        data = {}
-        for attr_name, attr_value in self.__dict__.items():
-            data[attr_name] = attr_value
+        data = self.__dict__.copy()
+        del data["rounds"]
 
-        store_rounds = []
+        data_round = []
         for round in self.rounds:
-            """ On parcours tous les rounds ayant été initialisés"""
-            store_matches = []
-            for match in round.matches:
-                """ On parcours les matchs dans le round"""
-                store_matches.append(match)
-            store_rounds.append(round)
+            r = [round.id, round.name, round.number, round.start, round.end]
+            data_round.append(r)
+
+
+
+
 
         self.table_tournoi.upsert(data, q.id == self.id)
+
         return self
 
     def __repr__(self):
         return self.name + " - " + self.id
+
+    def set_timer_bullet(self):
+        self.timer = "Bullet"
+
+    def set_timer_fast(self):
+        self.timer = "Coup Rapide"
+
+    def set_timer_blitz(self):
+        self.timer = "Blitz"
 
     def add_round(self):
         player = Player.list_player_tournament()

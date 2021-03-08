@@ -1,17 +1,18 @@
 # coding: utf-8
 
 import logging
-from controllers.control import Main_Controler
+from controllers.controller import Controller
 
 
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
+    tournament = Controller()
     try:
         while True:
-            tournament = Main_Controler()
+            tournament.menu_accueil()
     except Exception as e:
         logging.error(f"Problem with execution. Msg : {e}")
     finally:
-        print("\n" * 120)
+        print("\n" * 10)
         print("Merci d'etre passé ;o)")

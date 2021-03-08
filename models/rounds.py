@@ -3,17 +3,28 @@
 from datetime import datetime as dt
 from uuid import uuid4
 
+
+from tinydb import Query, TinyDB
+
 from models.matchs import Match
 from models.players import Player
 
 
 class Round:
+
+    __db = TinyDB('tournament.json')
+    table_round = __db.table('round')
     """Contient les informations Date de debut et de fin,
      et listes des matches à venir"""
 
-    def __init__(self, round_number: int, players: list[Player], start_date=None,
-                 end_date=None, matches: list[Match] = None):
-        self.id = str(uuid4())
+    def __init__(self, round_number: int, players: list, start_date=None,
+                 end_date=None, matches: list = None, id: str = None):
+
+        if isinstance(id, str) and id is not None:
+            self.id = id
+        else:
+            self.id = str(uuid4())
+
         self.number = round_number
         self.name = 'Round {}'.format(self.number)
 
@@ -39,7 +50,6 @@ class Round:
             self.matches = matches
         else:
             self.matches = self.__define_matchs_in_round()
-
 
     def __repr__(self):
         return self.name
@@ -74,7 +84,7 @@ class Round:
                 for x in range(nb_joueur // 2):
                     player1 = players_list_1.pop()
                     player2 = players_list_2.pop()
-                    first_round.append(Match([player1, player2]))
+                    first_round.append(Match([player1.fullname, player2.fullname]))
                 return first_round
 
             else:
@@ -90,7 +100,7 @@ class Round:
             while len(free_players):
                 player1 = free_players.pop()
                 player2 = free_players.pop()
-                second_round.append(Match([player1, player2]))
+                second_round.append(Match([player1.fullname, player2.fullname]))
             return second_round
         else:
             """ Definition des autres tours
@@ -113,6 +123,6 @@ class Round:
 
                 player2 = available_opponent.pop()
 
-                other_round.append(Match([player1, player2]))
+                other_round.append(Match([player1.fullname, player2.fullname]))
 
             return other_round

@@ -6,6 +6,9 @@ from tinydb import Query, TinyDB
 
 
 class Player:
+
+    __db = TinyDB('players.json')
+    __db = __db.table('players')
     """
     Classe qui va gérer l'ensemble des joueurs. Participant ou non au tournoi.
     """
@@ -20,7 +23,7 @@ class Player:
         self._genre = kwargs['_genre']
         self.elo = 0
         self.point = 0
-        self.has_met = set()       # passage list -> set pour eviter les doublons
+        self.has_met = []
         self.status = False
         Player._NB_PLAYER = Player._NB_PLAYER + 1
         self.id = Player._NB_PLAYER
@@ -35,7 +38,7 @@ class Player:
 
     def update_player(self):
         q = Query()
-        players_table = self.__player_db_acces()
+        players_table = self.__db
         player_data = self.__serialize_player()
         players_table.upsert(player_data, q.uuid == self.uuid)
 
@@ -116,30 +119,15 @@ class Player:
         for player in p:
             player.point = 0
 
-        p = [player for player in cls._PLAYERS if len(player.has_met) ]
+        p = [player for player in cls._PLAYERS if len(player.has_met)]
 
         for player in p:
             player.has_met = set()
 
         cls.save_all_players()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @classmethod
-    def _list_all_player(cls):
+    def list_all_player(cls):
         var = [player for player in cls._PLAYERS]
         return var
 
@@ -156,16 +144,14 @@ class Player:
         Methode de classe permettant de sauvegarder l'ensemble des joueurs.
         Class method allowing all players to be saved.
         """
-        players_db = cls.__player_db_acces()
+        players_db = cls.__db
         players_db.truncate()
         serialized_players = [cls.player.__serialize_player() for cls.player
                               in cls._PLAYERS]
         players_db.insert_multiple(serialized_players)
 
     def __serialize_player(self):
-        data = {}
-        for attr_name, attr_values in self.__dict__.items():
-            data[attr_name] = attr_values
+        data = self.__dict__
         return data
 
     @classmethod
@@ -176,19 +162,13 @@ class Player:
 
         Class method allowing all players to be loaded.
         """
-        players_db = cls.__player_db_acces()
-        serialized_players_list = players_db.all()
+        serialized_players_list = cls.__db.all()
         [Player(**data) for data in serialized_players_list]
 
-    @staticmethod
-    def __player_db_acces():
-        db = TinyDB('players.json')
-        db = db.table('players')
-        return db
 
 
 if __name__ == '__main__':
     Player.load_players()
-    Player._list_all_player()
+    Player.list_all_player()
     print("heu....")
     Player.initialise_point_meeting()
