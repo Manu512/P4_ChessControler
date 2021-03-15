@@ -4,7 +4,7 @@
 
 class Match:
     """ Classe pour instancier les matches"""
-    def __init__(self, players: list, scores: list = None):
+    def __init__(self, players: list, scores: list = None) -> list:
         self.players = [players[0], players[1]]
         self.score = scores
 

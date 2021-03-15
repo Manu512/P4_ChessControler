@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
+from tinydb.operations import delete
 
 
 class Player:
@@ -31,10 +32,10 @@ class Player:
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
-        Player._PLAYERS.append(self)
+        self._PLAYERS.append(self)
 
     def __repr__(self):
-        return "{} - ELO : {} - Pts : {} ".format(self.fullname, self.elo, self.point)
+        return "{} - {} - {} pts".format(self.id, self.fullname, self.point)
 
     def update_player(self):
         q = Query()
@@ -84,7 +85,7 @@ class Player:
         self.update_player()
 
     def add_meet(self, player: str):
-        self.has_met.add(player)
+        self.has_met.append(player)
         self.update_player()
 
     def switch_player_tournament(self):
@@ -112,19 +113,36 @@ class Player:
             return True                  # Paire
 
     @classmethod
-    def initialise_point_meeting(cls):
+    def initialise_players_data(cls):
         """ Class method call for initialize Tournament and reset old point and meet between players."""
-        p = [player for player in cls._PLAYERS if player.point != 0]
 
-        for player in p:
-            player.point = 0
+        q = Query()
 
-        p = [player for player in cls._PLAYERS if len(player.has_met)]
+        players_table = cls.__db
 
-        for player in p:
-            player.has_met = set()
+        players_table.update_multiple([
+                ({'point': 0}, q.point.exists()),
+                ({'has_met': []}, q.has_met.exists())
+        ])
 
-        cls.save_all_players()
+        # ({'status': False}, q.status.exists()),
+
+        # p = [player for player in cls._PLAYERS if player.point != 0]
+        #
+        # for player in p:
+        #     player.point = 0
+        #
+        # p = [player for player in cls._PLAYERS if len(player.has_met)]
+        #
+        # for player in p:
+        #     player.has_met.clear()
+        #
+        # p = [player for player in cls._PLAYERS if player.status]
+        #
+        # for player in p:
+        #     player.switch_player_tournament()
+        #
+        # cls.save_all_players()
 
     @classmethod
     def list_all_player(cls):
@@ -159,7 +177,6 @@ class Player:
         """
         Methode de classe permettant de charger l'ensemble des joueurs connus.
 
-
         Class method allowing all players to be loaded.
         """
         serialized_players_list = cls.__db.all()
@@ -171,4 +188,4 @@ if __name__ == '__main__':
     Player.load_players()
     Player.list_all_player()
     print("heu....")
-    Player.initialise_point_meeting()
+    Player.initialise_players_data()

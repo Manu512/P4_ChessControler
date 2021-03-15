@@ -212,7 +212,6 @@ class Controller(BaseController):
         for player in Player._PLAYERS:
             if player.name.upper() == search_response[0].upper() and \
                     player.first_name.capitalize() == search_response[1].capitalize():
-                print(player)
                 return player
 
         self.view_menu.error_msg("Joueur introuvable !\n"
@@ -276,20 +275,19 @@ class Controller(BaseController):
             self.add_description()
 
     def create_tournament(self):
+        Player.initialise_players_data()
         self.tournament = Tournoi()
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()
 
     def switch_rctournament(self):
-        try:
-            RoundController(self.tournament)
-        except AttributeError:
-            self.view_menu.error_msg("Commençons par initialiser le tournoi !")
-            self.menu_tournament()
+        RoundController(self.tournament)
 
     def load_tournament(self):
-        pass
+        self.tournament = Tournoi.load()
+        self.round = self.tournament.rounds[-1]
+        self.switch_rctournament()
 
     def save_tournament(self):
         self.tournament.save()

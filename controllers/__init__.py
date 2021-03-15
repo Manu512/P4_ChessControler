@@ -4,15 +4,16 @@
 import re
 from typing import Union
 from views.views import Display
+from datetime import datetime as dt
 
 
 class BaseController:
     """
     Base Class
     """
-    def __init__(self):
+    def __init__(self, tournament=None):
         self.view_menu = Display()
-        self.tournament = None
+        self.tournament = tournament
         self.round = None
 
     # --------------------------GENERAL METHODS------------------------------------

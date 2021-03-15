@@ -10,8 +10,8 @@ from models.tournoi import Tournoi
 class RoundController(BaseController):
 
     def __init__(self, tournament: Tournoi):
-        super().__init__()
-        self.tournament = tournament
+        super().__init__(tournament)
+        # self.tournament = tournament
         self.round = tournament.rounds[-1]
         self.menu_round()
 
