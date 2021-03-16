@@ -1,18 +1,22 @@
+""" Model Player """
 # coding: utf-8
+
 from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
-from tinydb.operations import delete
 
 
 class Player:
+    """
+    Class that will manage all the players. Participating or not in the tournament.
+
+    Classe qui va gérer l'ensemble des joueurs. Participant ou non au tournoi.
+    """
 
     __db = TinyDB('players.json')
     __db = __db.table('players')
-    """
-    Classe qui va gérer l'ensemble des joueurs. Participant ou non au tournoi.
-    """
+
     _NB_PLAYER = 0
     _NB_ACTIVE_PLAYERS = 0
     _PLAYERS = []
@@ -38,6 +42,10 @@ class Player:
         return "{} - {} - {} pts".format(self.id, self.fullname, self.point)
 
     def update_player(self):
+        """
+        Method of saving player information (creation or update)
+        Methode de sauvegarde des informations joueurs (création ou mise à jour)
+        """
         q = Query()
         players_table = self.__db
         player_data = self.__serialize_player()
@@ -46,8 +54,7 @@ class Player:
     @property
     def age(self) -> int:
         """
-        Propriété permettant de calculer l'age a l'aide de la date
-        d'anniversaire.
+        Property for calculating age using the date of birth.
         """
         birth = dt.strptime(self.dob, '%d/%m/%Y')
         today = dt.today()
@@ -56,12 +63,15 @@ class Player:
 
     @property
     def fullname(self):
+        """
+        Property displaying the first and last name of the player.
+        """
         return f"{self.name} {self.first_name}"
 
     @property
     def sexe(self) -> str:
         """
-        Propriété pour afficher le genre de facon lisible
+        Property to display the gender in a readable way
         """
         if self._genre == 'F':
             sexe = 'Femme'
@@ -69,22 +79,34 @@ class Player:
             sexe = 'Homme'
         return sexe
 
-    def update_classement(self, new_classement: int):
+    def update_classement(self, new_ranking: int):
         """
-        Methode pour mettre a jour le classement
+        Method to update the ranking
         """
-        self.elo = new_classement
+        self.elo = new_ranking
         self.update_player()
 
     def win(self):
+        """
+        Method for adding victory points
+        """
         self.point += 1
         self.update_player()
 
     def equality(self):
+        """
+        Method for adding points in case of a tie
+        """
         self.point += 0.5
         self.update_player()
 
     def add_meet(self, player: str):
+        """
+        Method for adding the ID of an opponent that has been encountered
+        in the attribute self.has_met
+
+        :param player: str id of the opponent.
+        """
         self.has_met.append(player)
         self.update_player()
 
@@ -102,20 +124,23 @@ class Player:
         self.update_player()
 
     @classmethod
-    def isactiveplayerlistpair(cls):
-        """Method to find out if the list of active players is an even one
-        Method permettant de savoir si la liste des joueurs actifs est pair
+    def isactiveplayerlistpair(cls) -> bool:
+        """
+        Method to find out if the list of active players is even
         """
         cls.list_player_tournament()
         if cls._NB_ACTIVE_PLAYERS % 2:
-            return False                 # Impair
+            ret = False                 # Odd
         else:
-            return True                  # Paire
+            ret = True                  # Pair
+
+        return ret
 
     @classmethod
     def initialise_players_data(cls):
-        """ Class method call for initialize Tournament and reset old point and meet between players."""
-
+        """
+        Class method call for initialize Tournament and reset old point and meet between players.
+        """
         q = Query()
 
         players_table = cls.__db
@@ -125,35 +150,23 @@ class Player:
                 ({'has_met': []}, q.has_met.exists())
         ])
 
-        # ({'status': False}, q.status.exists()),
-
-        # p = [player for player in cls._PLAYERS if player.point != 0]
-        #
-        # for player in p:
-        #     player.point = 0
-        #
-        # p = [player for player in cls._PLAYERS if len(player.has_met)]
-        #
-        # for player in p:
-        #     player.has_met.clear()
-        #
-        # p = [player for player in cls._PLAYERS if player.status]
-        #
-        # for player in p:
-        #     player.switch_player_tournament()
-        #
-        # cls.save_all_players()
-
     @classmethod
-    def list_all_player(cls):
-        var = [player for player in cls._PLAYERS]
-        return var
+    def list_all_player(cls) -> list:
+        """
+        Class method that returns the list of all instantiated players.
+        """
+        # ret = [player for player in cls._PLAYERS]
+        return cls._PLAYERS
 
     @classmethod
     def list_player_tournament(cls) -> list:
-        var = [player for player in cls._PLAYERS if player.status]
-        cls._NB_ACTIVE_PLAYERS = len(var)
-        return var
+        """
+        Class method returning a list of player objects with an active status
+        :return: list of the registered players
+        """
+        ret = [player for player in cls._PLAYERS if player.status]
+        cls._NB_ACTIVE_PLAYERS = len(ret)
+        return ret
 
 # --------------------------TinyDB parts---------------------------------------
     @classmethod
@@ -168,24 +181,18 @@ class Player:
                               in cls._PLAYERS]
         players_db.insert_multiple(serialized_players)
 
-    def __serialize_player(self):
+    def __serialize_player(self) -> dict:
+        """
+        Method to return the set of arguments as a dictionary
+        :return: dict
+        """
         data = self.__dict__
         return data
 
     @classmethod
     def load_players(cls):
         """
-        Methode de classe permettant de charger l'ensemble des joueurs connus.
-
-        Class method allowing all players to be loaded.
+        Class method for loading all known players.
         """
         serialized_players_list = cls.__db.all()
         [Player(**data) for data in serialized_players_list]
-
-
-
-if __name__ == '__main__':
-    Player.load_players()
-    Player.list_all_player()
-    print("heu....")
-    Player.initialise_players_data()
