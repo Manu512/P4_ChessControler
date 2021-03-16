@@ -1,12 +1,15 @@
+""" Objet View"""
 # coding: utf-8
+
 import os
 from platform import system
+
+from models.matchs import Match
 
 
 class Display:
     """
-    Classe pour la gestion du menu propose à l'utilisateur
-
+    Class for displaying the menu
     """
 
     def __init__(self):
@@ -14,12 +17,24 @@ class Display:
 
     @staticmethod
     def clean():
+        """
+        Method to reset/clear the console window
+        """
         if system() == 'Windows':
             os.system('cls')
         else:
             os.system('clear')
 
     def display_menu(self, title: str, subtitle: str = "\n", question: dict = None):
+        """
+        Method to display a menu.
+
+        Args:
+            title: str: Main title of the console
+            subtitle: str: Subtitle of the console
+            question: dict{ int(Choice) : Tuple( method to launch, Text to display )}
+        """
+        self.clean()
         print(f"{title}")
         print(f"{subtitle}\n")
         for key, value in question.items():
@@ -29,6 +44,11 @@ class Display:
 # -----------------------SubMenu Round ---------------------------------------
 
     def view_matchs(self, rounds):
+        """
+
+        Args:
+            rounds:
+        """
         self.clean()
         print(f"Bienvenue dans le gestionnaire de tournois d'échec.\n"
               f"Suivi des Matchs du tour N° {rounds.number}")
@@ -45,6 +65,11 @@ class Display:
         print("\n" * 5)
 
     def select_match(self, rounds):
+        """
+        A method of displaying and selecting a match.
+        Args:
+            rounds:
+        """
         self.clean()
         print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
               f"Matchs du rounds {rounds.number}")
@@ -61,7 +86,12 @@ class Display:
 
         print("\n" * 5)
 
-    def select_winner(self, match):
+    def select_winner(self, match: Match):
+        """
+        Method to display and select the winner of the match.
+        Args:
+            match: obj(Match)
+        """
         self.clean()
         print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSuivi des "
               f"Matchs opposant : {match.players[0].fullname} à {match.players[1].fullname}")
@@ -74,31 +104,11 @@ class Display:
         print("\n" * 5)
 
     @staticmethod
-    def error_msg(msg):
+    def error_msg(msg: str):
+        """
+        Call method to display an error message and request a keystroke to continue.
+        Args:
+            msg: str : Error message
+        """
         print(msg)
-
-    @classmethod
-    def view_menu(cls, menu, special=False):
-        """Method permettant d'afficher les menus ou les informations
-         contenues dans une liste ou un dictionnaire"""
-        if special:
-            for choice, text, param in menu:
-                if param:
-                    print("\t{} : {} = {}".format(choice, text, param))
-                else:
-                    print("\t{} : {}".format(choice, text))
-
-        elif type(menu) is list:
-            for info in menu:
-                print("\t", info)
-
-        else:
-            for choice, text in menu.items():
-                print("\t", choice, ":", text)
-
-        print("\n")
-
-
-if __name__ == '__main__':
-    d = Display()
-    d.view_menu()
+        input("Pressez une touche pour continuer...")
