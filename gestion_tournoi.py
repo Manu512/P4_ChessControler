@@ -1,6 +1,8 @@
+""" Main launch """
 # coding: utf-8
 
 import logging
+
 from controllers.controller import Controller
 
 
@@ -11,8 +13,8 @@ if __name__ == '__main__':
     try:
         while True:
             tournament.menu_accueil()
-    except Exception as e:
-        logging.error(f"Problem with execution. Msg : {e}")
+    except Exception as exc:
+        logging.error(f"Problem with execution. Msg : {exc}")
     finally:
         print("\n" * 10)
         print("Merci d'etre passé ;o)")

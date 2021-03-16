@@ -3,19 +3,19 @@
 
 from controllers import BaseController
 
-from models.tournoi import Tournoi
+from models.tournoi import Tournament
 
 
 class RoundController(BaseController):
     """
-    Objet Permettant le contrôle et le suivi des rounds du tournoi.
+    Purpose Enabling the control and monitoring of tournament rounds.
 
     """
-    def __init__(self, tournament: Tournoi):
+    def __init__(self, tournament: Tournament):
         """
 
         Args:
-            tournament: obj(Tournoi)
+            tournament: obj(Tournament)
         """
         super().__init__(tournament)
         self.round = tournament.rounds[-1]

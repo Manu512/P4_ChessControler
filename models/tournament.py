@@ -1,3 +1,4 @@
+""" Model Tournament """
 # coding: utf-8
 from datetime import datetime as dt
 from uuid import uuid4
@@ -8,19 +9,21 @@ from models.rounds import Round
 from models.players import Player
 
 
-class Tournoi:
-
+class Tournament:
+    """
+    Purpose Enabling the control and monitoring of tournament.
+    """
     __db = TinyDB('tournament.json')
     table_tournoi = __db.table('tournament')
 
-    NAME = "Tournoi d'échec"
+    NAME = "Tournament d'échec"
     NB_ROUND = 4
     NB_DEFAULT_PLAYERS = 8
     TIMER = "Bullet"
     DESCRIPTION = ""
     LOCATION = 'France'
 
-    def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = None,
+    def __init__(self, identity: str = None, name: str = "Tournament d'échec", location: str = None,
                  tournament_date: str = None, description: str = None,
                  timer: str = TIMER, rounds: list[Round] = None, rounds_number: int = None):
 
@@ -63,7 +66,9 @@ class Tournoi:
                 self.rounds.append(round)
 
     def save(self):
-        """ Methode de sauvegarde des données au format JSON avec TinyDB"""
+        """
+        Method of saving data in JSON format with TinyDB
+        """
         q = Query()
 
         data = self.__dict__.copy()
@@ -79,7 +84,8 @@ class Tournoi:
             data_matches = []
             for match in round.matches:
                 if isinstance(match.score, list):
-                    match_serialize = ([match.players[0].uuid, match.players[1].uuid], [match.score[0], match.score[1]])
+                    match_serialize = ([match.players[0].uuid, match.players[1].uuid],
+                                       [match.score[0], match.score[1]])
                 else:
                     match_serialize = ([match.players[0].uuid, match.players[1].uuid], None)
                 data_matches.append(match_serialize)
@@ -91,7 +97,8 @@ class Tournoi:
 
     @classmethod
     def load(cls):
-        """Methode de chargement d'un tournoi sauvegarde
+        """
+        Method of loading a backup tournament
         """
         Player.initialise_players_data()
         data_load = cls.table_tournoi.all()
@@ -109,13 +116,13 @@ class Tournoi:
         t['description'] = data_load['description']
         t['rounds_number'] = data_load['rounds_number']
 
-        tournament = Tournoi(t['identity'],
-                             t['name'],
-                             t['location'],
-                             t['tournament_date'],
-                             t['description'],
-                             t['timer'],
-                             rounds_number=t['rounds_number'])
+        tournament = Tournament(t['identity'],
+                                t['name'],
+                                t['location'],
+                                t['tournament_date'],
+                                t['description'],
+                                t['timer'],
+                                rounds_number=t['rounds_number'])
 
         # --------- Load Objet Player ---------------
 
@@ -128,7 +135,7 @@ class Tournoi:
             """
             p_found = [p for p in Player._PLAYERS if player[0] == p.uuid]
 
-            assert p_found          # Leve une exception si le joueur n'est pas trouvé
+            assert p_found          # Raises an exception if the player is not found
 
             p_found = p_found[0]
 
@@ -142,9 +149,9 @@ class Tournoi:
         t['rounds'] = data_load['rounds']
         for n, round in enumerate(t['rounds']):
             """
-            1 - On balaye les rounds sauvegardés.
-            2 - On extrait les infos du rounds.
-            3 - On extraits les matchs et les scores.
+            1 - We scan the saved rounds.
+            2 - We extract the information from the rounds.
+            3 - We extract the matches and the scores.
             """
             if n % 2 == 0:
                 tournament.rounds.append(Round(round['number'],
@@ -154,7 +161,6 @@ class Tournoi:
                                          t['rounds'][n+1]['matches'],
                                          round['id']))
 
-        # --------- On crée les objets tournoi, rounds, matches avec les infos récupérées
         return tournament
 
     def __repr__(self):
@@ -171,13 +177,9 @@ class Tournoi:
 
     def add_round(self):
         player = Player.list_player_tournament()
-        """
-        Contrôle du nombre de joueur selectionné pour le tournoi
-        """
         r = Round(round_number=self.rounds_number + 1, players=player)
         self.rounds.append(r)
         self.rounds_number += 1
-        return
 
     @property
     def current_round(self):

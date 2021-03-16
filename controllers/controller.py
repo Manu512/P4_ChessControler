@@ -5,7 +5,7 @@ from controllers import BaseController
 from controllers.round_controller import RoundController
 
 from models.players import Player
-from models.tournoi import Tournoi
+from models.tournoi import Tournament
 
 
 class Controller(BaseController):
@@ -47,11 +47,11 @@ class Controller(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion du tournoi."
 
-        menu = {1: (self.change_name_tournament, f"Nom : {Tournoi.NAME}"),
-                2: (self.change_number_round_tournament, f"Nombre de rounds : {Tournoi.NB_ROUND}"),
-                3: (self.change_timer_rules, f"Règle de temps : {Tournoi.TIMER}"),
-                4: (self.change_location, f"Localisation : {Tournoi.LOCATION}"),
-                5: (self.add_description, f"Description : {Tournoi.DESCRIPTION}"),
+        menu = {1: (self.change_name_tournament, f"Nom : {Tournament.NAME}"),
+                2: (self.change_number_round_tournament, f"Nombre de rounds : {Tournament.NB_ROUND}"),
+                3: (self.change_timer_rules, f"Règle de temps : {Tournament.TIMER}"),
+                4: (self.change_location, f"Localisation : {Tournament.LOCATION}"),
+                5: (self.add_description, f"Description : {Tournament.DESCRIPTION}"),
                 6: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
                 7: (self.switch_rctournament, "Gestion des rounds"),
                 8: (self.load_tournament, "Charger un tournoi sauvegardé"),
@@ -225,7 +225,7 @@ class Controller(BaseController):
         """
         valid = self.ask_and_store_text('Saisir le nom du tournoi : ')
         if valid[0]:
-            Tournoi.NAME = valid[1]
+            Tournament.NAME = valid[1]
         else:
             self.change_name_tournament()
 
@@ -235,7 +235,7 @@ class Controller(BaseController):
         """
         valid = self.ask_and_store_number('Saisir le nombre de tours du tournoi : ')
         if valid[0]:
-            Tournoi.NB_ROUND = valid[1]
+            Tournament.NB_ROUND = valid[1]
         else:
             self.change_number_round_tournament()
 
@@ -245,10 +245,10 @@ class Controller(BaseController):
                 """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de paramétrage du timer du tournoi."
-        menu = {1: (Tournoi.set_timer_bullet, "BULLET"),
-                2: (Tournoi.set_timer_blitz, "BLITZ"),
-                3: (Tournoi.set_timer_fast, "COUP RAPIDE"),
-                9: (self.menu_tournament, 'Retour Accueil Tournoi')}
+        menu = {1: (Tournament.set_timer_bullet, "BULLET"),
+                2: (Tournament.set_timer_blitz, "BLITZ"),
+                3: (Tournament.set_timer_fast, "COUP RAPIDE"),
+                9: (self.menu_tournament, 'Retour Accueil Tournament')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
@@ -260,7 +260,7 @@ class Controller(BaseController):
         """
         valid = self.ask_and_store_text('Saisir la localisation du tournoi : ')
         if valid[0]:
-            Tournoi.LOCATION = valid[1]
+            Tournament.LOCATION = valid[1]
         else:
             self.change_location()
 
@@ -270,13 +270,13 @@ class Controller(BaseController):
         """
         valid = input("Saisir la description du tournoi : ")
         if self._control_user_input('sentence', valid):
-            Tournoi.DESCRIPTION = valid
+            Tournament.DESCRIPTION = valid
         else:
             self.add_description()
 
     def create_tournament(self):
         Player.initialise_players_data()
-        self.tournament = Tournoi()
+        self.tournament = Tournament()
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()
@@ -285,7 +285,7 @@ class Controller(BaseController):
         RoundController(self.tournament)
 
     def load_tournament(self):
-        self.tournament = Tournoi.load()
+        self.tournament = Tournament.load()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()
 
@@ -329,5 +329,3 @@ class Controller(BaseController):
         Fonction qui va lancer le print de la liste des matches du tournois
         """
         pass
-
-
