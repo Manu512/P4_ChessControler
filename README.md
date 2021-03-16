@@ -1,4 +1,4 @@
-# __Suivi Tournoi Echec Projet P4__
+# __Suivi Tournoi Échec Projet P4__
 
 ## Prérequis
 Une installation de Python 3.3 minimum pour pouvoir créer l'environnement virtuel avec cette méthode.
@@ -10,10 +10,20 @@ Executer la commande :
 python)
 
 ## Activation et installations des dépendances nécessaires au script dans l'environnement virtuel
-### Sous Windows les commandes à executer :
+### Sous Windows les commandes à exécuter :
 * `env/Script/activate`
 * `pip install -r requirements.txt`
 
-### Sous Linux les commandes à executer : 
+### Sous Linux les commandes à exécuter : 
 * `source env/bin/activate`
 * `pip install -r requirements.txt`
+
+## Génération d'un rapport html flake8
+* `flake8 --format=html --htmldir=flake_rapport --max-line-length=119`
+
+
+## Lancement et utilisation du Gestionnaire de tournoi.
+
+Une fois l'environnement virtuel installé et activé, exécuter la commande suivante :
+* `python tournament_launcher.py`
+

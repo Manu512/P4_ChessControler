@@ -1,2 +1,2 @@
 TinyDB~=4.4.0
-jsonpickle
+flake8-html
