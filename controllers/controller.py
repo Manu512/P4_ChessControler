@@ -3,22 +3,28 @@
 
 from controllers import BaseController
 from controllers.round_controller import RoundController
+from controllers.report_controller import ReportController
 
 from models.players import Player
-from models.tournoi import Tournament
+from models.tournament import Tournament
 
 
 class Controller(BaseController):
-
+    """
+    Objet Controlleur central pour les menus de bases
+    """
     def __init__(self):
         super().__init__()
         Player.load_players()
 
     def menu_accueil(self):
+        """
+        Method for displaying the home menu
+        """
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
         menu = {1: (self.menu_tournament, "Gestion tournoi"),
                 2: (self.menu_players, "Gestion des joueurs"),
-                3: (self.menu_rapport, "Affichage des rapports"),
+                3: (ReportController, "Affichage des rapports"),
                 9: (exit, "Sortie")}
 
         self.view_menu.display_menu(title=title, question=menu)
@@ -26,6 +32,9 @@ class Controller(BaseController):
         self.ask_and_launch(menu=menu)
 
     def menu_players(self):
+        """
+        Method to display the player management menu
+        """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion des joueurs."
 
@@ -33,7 +42,6 @@ class Controller(BaseController):
                 2: (self.update_player_elo, "Modifier le classement ELO d'un joueur"),
                 3: (self.add_player_tournament, "Ajouter un joueur au tournoi actuel"),
                 4: (self.remove_player_tournament, "Supprimer un joueur du tournoi actuel"),
-                5: (Player.save_all_players, "Sauvegarder tous les joueurs"),
                 9: (self.menu_accueil, "Retour")}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
@@ -42,7 +50,7 @@ class Controller(BaseController):
 
     def menu_tournament(self):
         """
-        Menu qui permet le paramétrage du tournoi.
+        Menu which allows the setting of the tournament.
         """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion du tournoi."
@@ -67,44 +75,14 @@ class Controller(BaseController):
         self.ask_and_launch(menu=menu)
         self.menu_tournament()
 
-    # def menu_tournament(self):
-    #     title = "Bienvenue dans le gestionnaire de tournois d'échec."
-    #     subtitle = "Page de gestion du tournoi."
-    #
-    #     menu = {1: (self.menu_tournament, "Configurer un nouveau tournoi"),
-    #             2: (self.load_tournament, "Charger un tournoi sauvegardé"),
-    #             3: (self.save_tournament, "Sauvegarder tournoi actuel"),
-    #             9: (self.menu_accueil, "Retour Accueil")}
-    #
-    #     if self.tournament is None:    # Not possible to save without tournament
-    #         del menu[3]
-    #
-    #     self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
-    #
-    #     self.ask_and_launch(menu=menu)
-
-    def menu_rapport(self):
-        title = "Bienvenue dans le gestionnaire de tournois d'échec."
-        subtitle = "Page d'édition des rapports"
-        menu = {1: (self.list_all_players, "Liste de tous les joueurs"),
-                2: (self.list_tournament_players, "Liste de tous les joueurs d'un tournoi"),
-                3: (self.list_tournaments, "Liste de tous les tournois"),
-                4: (self.list_all_rounds, "Liste de tous les tours du tournoi"),
-                5: (self.list_all_matchs, "Liste de tous les matches du tournoi"),
-                9: (self.menu_accueil, "Retour")}
-
-        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
-
-        self.ask_and_launch(menu=menu)
-
     # --------------------------_PLAYERS METHODS------------------------------------
 
     def add_player(self):
         """
-        Affiche le menu add_player
-        Boucle pour chaque information à récupérer
-        Nom (name), Prénom (firstname), Date de Naissance (dob), sexe (_genre)
-        Puis crée un nouveau joueur et sauvegarde la liste.
+        Display the add_player menu
+        Loop for each information to retrieve
+        Name (name), Firstname (firstname), Date of Birth (dob), Sex (_genre)
+        Then create a new player and save the list.
         """
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\nAjout d'un joueur"
         subtitle = "Saisir dans l'ordre :\n"
@@ -126,14 +104,14 @@ class Controller(BaseController):
                     valid = self.ask_and_store_text(menu[m+1][1] + ' : ')
                 response.append(valid[1])
             elif choice[m] == 'dob':
-                valid = input(menu[m+1][1] + ' : ')
+                valid = self.view_menu.input(menu[m+1][1] + ' : ')
                 while not self._control_user_input("dob", valid):
-                    valid = input(menu[m+1][1] + ' : ')
+                    valid = self.view_menu.input(menu[m+1][1] + ' : ')
                 response.append(valid[1])
             elif choice[m] == '_genre':
-                valid = input(menu[m+1][1] + ' : ')
+                valid = self.view_menu.input(menu[m+1][1] + ' : ')
                 while not self._control_user_input("_genre", valid):
-                    valid = input(menu[m+1][1] + ' : ')
+                    valid = self.view_menu.input(menu[m+1][1] + ' : ')
                 response.append(valid)
             res = dict(zip(choice, response))
         Player(**res)
@@ -142,10 +120,14 @@ class Controller(BaseController):
 
     def update_player_elo(self):
         """
-        1° Demande du nom et du prenom du joueur
-        2° Recherche du joueur
-        3° Affichage du classement actuel
-        4° Input pour le nouveau classement
+
+        Method to update the player's data.
+
+        1° Request of the player's name and firstname
+        2° Search for the player
+        3° Display of the current ranking
+        4° Input of the new ranking
+
         """
         player = self.found_specific_player()
         if player is not None:
@@ -157,16 +139,18 @@ class Controller(BaseController):
 
     def add_player_tournament(self):
         """
-        1° Demande du nom et du Prenom du joueur
-        2° Recherche du joueur s'il n'est pas déjà actif dans le tournoi
-        3° Demande validation quant au passage du status à 1
+        Method to assign a player to the tournament.
+
+        1° Request the name and firstname of the player
+        2° Search for the player if he is not already active in the tournament
+        3° Request validation of the active status for the tournament
         """
         player = self.found_specific_player()
         if player is not None:
             if player.status:
-                self.view_menu.error_msg("Attention {} {} est déjà "
-                                         "inscrit au tournoi"
-                                         .format(player.name, player.first_name))
+                self.view_menu.stand_by_msg("Attention {} {} est déjà "
+                                            "inscrit au tournoi"
+                                            .format(player.name, player.first_name))
             else:
                 valid = self.ask_and_store_text("Confirmez vous que {} {} "
                                                 "participe au tournoi ? "
@@ -178,15 +162,17 @@ class Controller(BaseController):
 
     def remove_player_tournament(self):
         """
-        1° Demande du nom et du Prenom du joueur
-        2° Recherche du joueur s'il n'est pas déjà inactif dans le tournoi
-        3° Demande validation quant au passage du status à 1
+        Method to remove the active status from the tournament
+
+        1° Request the name and firstname of the player
+        2° Search for the player if he is not already inactive in the tournament
+        3° Request validation of the inactive status for the tournament
         """
         player = self.found_specific_player()
         if player is not None:
             if not player.status:
-                self.view_menu.error_msg("Attention {} {} est déjà inscrit au "
-                                         "tournoi".format(player.name, player.first_name))
+                self.view_menu.stand_by_msg("Attention {} {} est déjà inscrit au "
+                                            "tournoi".format(player.name, player.first_name))
             else:
                 valid = self.ask_and_store_text("Confirmez vous que {} {} "
                                                 "participe plus au tournoi ? (O/N)"
@@ -197,8 +183,8 @@ class Controller(BaseController):
 
     def found_specific_player(self) -> Player:
         """
-        Methode qui va rechercher un joueur d'après son Nom et son prénom.
-        Renvoie un objet player
+        Method that will search for a player based on his Last Name and First Name.
+        Returns a player object
         """
         search_question = ('Nom du joueur recherché : ',
                            'Prénom du joueur recherché : ')
@@ -214,14 +200,14 @@ class Controller(BaseController):
                     player.first_name.capitalize() == search_response[1].capitalize():
                 return player
 
-        self.view_menu.error_msg("Joueur introuvable !\n"
-                                 "Recherché à nouveau ou créer le joueur")
+        self.view_menu.stand_by_msg("Joueur introuvable !\n"
+                                    "Rechercher à nouveau ou créer le joueur")
 
     # --------------------------TOURNAMENTS METHODS--------------------------------
 
     def change_name_tournament(self):
         """
-        Methode qui change le nom du tournoi.
+        Method that changes the name of the tournament.
         """
         valid = self.ask_and_store_text('Saisir le nom du tournoi : ')
         if valid[0]:
@@ -231,7 +217,7 @@ class Controller(BaseController):
 
     def change_number_round_tournament(self):
         """
-        Methode qui change le nombre de rounds du tournoi.
+        Method that changes the number of rounds in the tournament.
         """
         valid = self.ask_and_store_number('Saisir le nombre de tours du tournoi : ')
         if valid[0]:
@@ -241,8 +227,8 @@ class Controller(BaseController):
 
     def change_timer_rules(self):
         """
-                Menu qui permet le paramétrage du timer.
-                """
+        Menu that allows the timer to be set.
+        """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de paramétrage du timer du tournoi."
         menu = {1: (Tournament.set_timer_bullet, "BULLET"),
@@ -256,7 +242,7 @@ class Controller(BaseController):
 
     def change_location(self):
         """
-        Methode qui change la localisation du tournoi.
+        Method that changes the location of the tournament.
         """
         valid = self.ask_and_store_text('Saisir la localisation du tournoi : ')
         if valid[0]:
@@ -266,9 +252,9 @@ class Controller(BaseController):
 
     def add_description(self):
         """
-        Methode qui ajoute une description au niveau du tournoi.
+        Method that adds a description at the tournament level.
         """
-        valid = input("Saisir la description du tournoi : ")
+        valid = self.view_menu.input("Saisir la description du tournoi : ")
         if self._control_user_input('sentence', valid):
             Tournament.DESCRIPTION = valid
         else:
@@ -291,41 +277,3 @@ class Controller(BaseController):
 
     def save_tournament(self):
         self.tournament.save()
-
-    # --------------------------RAPPORT METHODS------------------------------------
-
-    def list_all_players(self):
-        """
-        Fonction qui va lancer le print de la liste des joueurs connus
-        """
-        # TODO : A metre en forme et dans le module VUE
-        response = Player.list_all_player()
-        print(response)
-        return
-
-    def list_tournament_players(self):
-        """
-        Fonction qui va lancer le print de la liste des joueurs du tournois
-        """
-        # TODO : A metre en forme et dans le module VUE
-        response = Player.list_player_tournament()
-        print(response)
-        return
-
-    def list_tournaments(self):
-        """
-        Fonction qui va lancer le print de la liste des tournois
-        """
-        pass
-
-    def list_all_rounds(self):
-        """
-        Fonction qui va lancer le print de tous les rounds du tournois
-        """
-        pass
-
-    def list_all_matchs(self):
-        """
-        Fonction qui va lancer le print de la liste des matches du tournois
-        """
-        pass

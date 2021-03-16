@@ -3,7 +3,7 @@
 
 from controllers import BaseController
 
-from models.tournoi import Tournament
+from models.tournament import Tournament
 
 
 class RoundController(BaseController):
@@ -38,17 +38,11 @@ class RoundController(BaseController):
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         self.ask_and_launch(menu=menu)
+
         if self.back_menu():
             pass
         else:
             self.menu_round()
-
-    @staticmethod
-    def back_menu():
-        """
-        Method that returns True
-        """
-        return True
 
     def display_list_round_matchs(self):
         """
@@ -90,7 +84,7 @@ class RoundController(BaseController):
         # Il faut aussi vérifier que les résultats de tous les matchs ont bien été renseigné
 
         if self.round.start != "" and self.round.end == "":     # If the old round is not finished ==> Error
-            self.view_menu.error_msg("Attention, le précédent round n'est pas fini !")
+            self.view_menu.stand_by_msg("Attention, le précédent round n'est pas fini !")
         else:
             self.tournament.add_round()
             self.round = self.tournament.rounds[-1]
@@ -104,6 +98,6 @@ class RoundController(BaseController):
         if self.round.start != "":
             self.round.end_round()
         else:
-            self.view_menu.error_msg("Commencer par démarrer un round !!!!")
+            self.view_menu.stand_by_msg("Commencer par démarrer un round !!!!")
 
         self.menu_round()

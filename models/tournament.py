@@ -167,15 +167,27 @@ class Tournament:
         return self.name + " - " + self.id
 
     def set_timer_bullet(self):
+        """
+        Method to set the timer attribute to Bullet.
+        """
         self.timer = "Bullet"
 
     def set_timer_fast(self):
+        """
+        Method to set the timer attribute to Fast.
+        """
         self.timer = "Coup Rapide"
 
     def set_timer_blitz(self):
+        """
+        Method to set the timer attribute to Blitz.
+        """
         self.timer = "Blitz"
 
     def add_round(self):
+        """
+        Method to add a round in tournament
+        """
         player = Player.list_player_tournament()
         r = Round(round_number=self.rounds_number + 1, players=player)
         self.rounds.append(r)
@@ -183,4 +195,7 @@ class Tournament:
 
     @property
     def current_round(self):
+        """
+        Property displaying the name of the current round.
+        """
         return self.rounds[-1].name

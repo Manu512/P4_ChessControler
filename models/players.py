@@ -39,7 +39,7 @@ class Player:
         self._PLAYERS.append(self)
 
     def __repr__(self):
-        return "{} - {} - {} pts".format(self.id, self.fullname, self.point)
+        return "{} ({} ans) - Elo : {}".format(self.fullname, self.age, self.elo)
 
     def update_player(self):
         """

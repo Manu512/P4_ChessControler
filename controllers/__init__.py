@@ -19,6 +19,13 @@ class BaseController:
 
     # --------------------------GENERAL METHODS------------------------------------
 
+    @staticmethod
+    def back_menu():
+        """
+        Method that returns True
+        """
+        return True
+
     def ask_and_launch(self, ask_input="Votre choix : ", *, menu: dict):
         """
         Method for interacting with the user, controlling their response
@@ -31,7 +38,7 @@ class BaseController:
         menu : named argument that contains a dictionary
         dict{int(x):(tuple(Method to be launched, Choice to be displayed)}
         """
-        user_input = input(ask_input)
+        user_input = self.view_menu.input(ask_input)
 
         if dict is not None:
             menu_to_analyse = menu
@@ -55,7 +62,7 @@ class BaseController:
         Returns: bool True if valid else False
         """
         if response not in list(menu):
-            self.view_menu.error_msg("Choix incorrect !! Veuillez ressaisir")
+            self.view_menu.stand_by_msg("Choix incorrect !! Veuillez ressaisir")
             ret = False
         else:
             ret = True
@@ -69,7 +76,7 @@ class BaseController:
 
         Returns: tuple(bool, user_entry)
         """
-        user_input = input(ask_input)
+        user_input = self.view_menu.input(ask_input)
 
         if self._control_user_input('text', user_input):
             ret = True
@@ -88,7 +95,7 @@ class BaseController:
         tuple[bool, int] if valid input
         tuple[bool, str] if invalid input
         """
-        user_input = input(ask_input)
+        user_input = self.view_menu.input(ask_input)
 
         if self._control_user_input('number', user_input):
             ret = True, int(user_input)
@@ -103,37 +110,37 @@ class BaseController:
 
         if question in ['name', 'first_name', 'text']:  # Checking for numbers in name/firstname
             if self.__check_number_in_word(response):
-                self.view_menu.error_msg('Saisi non valide !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Saisi non valide !\nVeuillez ressaisir !')
                 return False
         elif question == 'sentence':    # Check if more than one word is present
             if self.__check_sentence(response) < 2:
-                self.view_menu.error_msg('Saisie non valide !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Saisie non valide !\nVeuillez ressaisir !')
                 return False
         elif question == 'dob':     # Check the date of birth
             try:
                 dt.strptime(response, '%d/%m/%Y')
             except ValueError:
-                self.view_menu.error_msg('Veuillez saisir une date de naissance'
-                                         ' valide !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Veuillez saisir une date de naissance'
+                                            ' valide !\nVeuillez ressaisir !')
                 return False
         elif question == '_genre':  # Checks whether the gender entry is correct.
             if response not in ['H', 'F']:
-                self.view_menu.error_msg('Genre saisi non valide !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Genre saisi non valide !\nVeuillez ressaisir !')
                 return False
         elif question == 'bool':
             if response not in ['O', 'N']:  # Checks whether the Y/N entry is correct.
-                self.view_menu.error_msg('Réponse non valide !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Réponse non valide !\nVeuillez ressaisir !')
                 return False
         elif question == 'number':  # Checks the number entered when entering the Elo ranking
             try:
                 int(response)
             except ValueError:
-                self.view_menu.error_msg('Veuillez saisir un nombre entier !\nVeuillez ressaisir !')
+                self.view_menu.stand_by_msg('Veuillez saisir un nombre entier !\nVeuillez ressaisir !')
                 return False
             else:
                 if int(response) < 0:
-                    self.view_menu.error_msg('Veuillez saisir un nombre positif !'
-                                             '\nVeuillez ressaisir !')
+                    self.view_menu.stand_by_msg('Veuillez saisir un nombre positif !'
+                                                '\nVeuillez ressaisir !')
                     return False
         return True
 

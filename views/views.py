@@ -41,6 +41,23 @@ class Display:
             print(f"\t{key} : {value[1]}")
         print("\n" * 2)
 
+    def display_data(self, title: str, subtitle: str = "\n", datas: list = None):
+        """
+        Method to display a menu.
+
+        Args:
+            title: str: Main title of the console
+            subtitle: str: Subtitle of the console
+            question: dict{ int(Choice) : Tuple( method to launch, Text to display )}
+        """
+        self.clean()
+        print(f"{title}")
+        print(f"{subtitle}\n")
+        for data in datas:
+            print(f"\t{data}")
+        print("\n" * 2)
+        self.stand_by_msg("")
+
 # -----------------------SubMenu Round ---------------------------------------
 
     def view_matchs(self, rounds):
@@ -104,7 +121,7 @@ class Display:
         print("\n" * 5)
 
     @staticmethod
-    def error_msg(msg: str):
+    def stand_by_msg(msg: str):
         """
         Call method to display an error message and request a keystroke to continue.
         Args:
@@ -112,3 +129,13 @@ class Display:
         """
         print(msg)
         input("Pressez une touche pour continuer...")
+
+    @staticmethod
+    def input(msg: str):
+        """
+        Call method to display a message and request a input.
+        Args:
+            msg: str : message to display
+        """
+        ret = input(msg)
+        return ret
