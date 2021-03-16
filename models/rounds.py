@@ -1,21 +1,26 @@
+""" Model Round """
 # coding: utf-8
 
 from datetime import datetime as dt
 from uuid import uuid4
-
-
-from tinydb import Query, TinyDB
 
 from models.matchs import Match
 from models.players import Player
 
 
 class Round:
+    """
+    Round object which contains all the information of the rounds.
+    Contains information about the start and end dates,
+    and list of upcoming matches
 
-    __db = TinyDB('tournament.json')
-    table_round = __db.table('round')
-    """Contient les informations Date de debut et de fin,
-     et listes des matches à venir"""
+    :param round_number: Current round number (int)
+    :param players: Player object list containing the players of the tournament.
+    :param start_date: Date + Start time of the round.
+    :param end_date: Date + End time of the round.
+    :param matches: Object List Match
+    :param id: unique identifier of the Round object
+    """
 
     def __init__(self, round_number: int, players: list, start_date=None,
                  end_date=None, matches: list = None, id: str = None):
@@ -59,12 +64,20 @@ class Round:
 
     def end_round(self):
         """
-        Method called at end of rounds
+        Methode appelé en fin de round pour horodater la fin du round.
         """
         self.end = dt.now().strftime("%Y-%m-%d %H:%M")
 
     @staticmethod
     def sort_player(players: list[Player], reverse=True) -> list:
+        """
+        Static method allows to sort the players in an ascending or descending way
+        in ascending or descending order by point or by elo rating
+        :param players: object list player
+        :param reverse: True or False sorting order
+        :return: the list of player objects sorted in the desired order
+
+        """
         if reverse:
             players.sort(reverse=True, key=lambda x: (int(x.point), int(x.elo)))
         else:
@@ -72,51 +85,47 @@ class Round:
         return players
 
     def __define_matchs_in_round(self) -> list:
-
-        global second_round, first_round, other_round
-
-        if self.number == 1:
-            """ Definition du premier tour"""
-
+        matches = []
+        if self.number == 1:    # Definition of first round matches
             self.players = self.sort_player(self.players, False)
             nb_joueur = len(self.players)
             if Player.isactiveplayerlistpair():
+                """
+                The list of players is divided by 2 and the 2 lists are linked together
+                for the 1st round matches
+                """
                 players_list_1 = self.players[:nb_joueur // 2]
                 players_list_2 = self.players[nb_joueur // 2:]
 
-                first_round = []
+                while len(players_list_1):
 
-                for x in range(nb_joueur // 2):
                     player1 = players_list_1.pop()
                     player2 = players_list_2.pop()
-                    first_round.append(Match([player1, player2]))
+                    matches.append(Match([player1, player2]))
 
             else:
                 print("Il manque un joueur pour générer toutes les paires")
-                """a retoucher dans controller et players"""
+                """
+                On pourrait ajouter un joueur factice pour générer un match 'blanc'
+                Ce n'est pas preciser dans l'énoncé mais cela est envisageable.
+                """
 
-        elif self.number == 2:
-            """ Definition du seconds tours
-            """
+        elif self.number == 2:  # Definition of the second round matches
+
             free_players = self.sort_player(self.players, False)
-            second_round = []
 
             while len(free_players):
                 player1 = free_players.pop()
                 player2 = free_players.pop()
-                second_round.append(Match([player1, player2]))
+                matches.append(Match([player1, player2]))
 
-        else:
-            """ Definition des autres tours
-            """
+        else:   # Definition of the meetings of the following rounds
+
             free_players = self.sort_player(self.players, False)
-            other_round = []
 
             while len(free_players):
                 player1 = free_players.pop()
-
                 available_opponent = free_players.copy()
-
                 player_to_remove = []
                 for opponent_player in available_opponent:
                     if opponent_player.uuid in player1.has_met:
@@ -127,13 +136,6 @@ class Round:
 
                 player2 = available_opponent.pop()
 
-                other_round.append(Match([player1, player2]))
+                matches.append(Match([player1, player2]))
 
-        if isinstance(first_round, list):
-            data = first_round
-        elif isinstance(second_round, list):
-            data = second_round
-        else:
-            data = other_round
-
-        return data
+        return matches
