@@ -11,7 +11,7 @@ from models.tournament import Tournament
 
 class Controller(BaseController):
     """
-    Objet Controlleur central pour les menus de bases
+    Object Central controller for basic menus
     """
     def __init__(self):
         super().__init__()
@@ -293,7 +293,7 @@ class Controller(BaseController):
         Method for initiating a new tournament
         """
         Player.initialise_players_data()
-        super().tournament = Tournament()
+        super().__init__(Tournament())
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()

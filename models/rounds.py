@@ -39,7 +39,7 @@ class Round:
             self.start = dt.now().strftime("%Y-%m-%d %H:%M")
 
         if isinstance(end_date, str) and end_date is not None:
-            self.end = dt.fromisoformat(end_date)
+            self.end = end_date
         else:
             self.end = end_date
 

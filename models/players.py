@@ -107,6 +107,7 @@ class Player:
 
         :param player: str id of the opponent.
         """
+        self.has_met = list(set(self.has_met))
         self.has_met.append(player)
         self.update_player()
 

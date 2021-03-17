@@ -36,10 +36,15 @@ class RoundController(BaseController):
 
         if self.round.end is None:
             menu[6] = (self.stop_round, f'Déclarer le round {self.round.number} fini')
-        else:
+        elif self.round.number <= self.tournament.max_rounds_number:
             result = [match.score for match in self.round.matches if match.score is None]
-            if result:
+            if len(result):
                 menu[6] = (self.add_score, f'{len(result)} score reste à saisir pour démarrer le prochain round')
+            elif len(result) == 0 and self.round.number == self.tournament.max_rounds_number:
+                menu[6] = (self.view_result, "Tournoi terminé / Affiché les résultats")
+            elif len(result) == 0 and self.round.number < self.tournament.max_rounds_number:
+                menu[4] = (self.display_list_round_matchs, 'Consulter les résultats des matchs')
+                del menu[5]
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
@@ -63,49 +68,41 @@ class RoundController(BaseController):
         self.view_menu.select_match(self.round)
         response = self.ask_and_store_number("Choisissez le match pour renseigner le vainqueur :")
 
-        if response[0]:     # response = tuple(False/True if valid input, input value)
-            match_played = self.round.matches[response[1]-1]
+        if 1 <= response[1] <= 4:
+            if response[0]:     # response = tuple(False/True if valid input, input value)
+                match_played = self.round.matches[response[1]-1]
 
-            if match_played.score is None:
-                self.view_menu.select_winner(match_played)
-                response = self.ask_and_store_number()
+                if match_played.score is None:
+                    self.view_menu.select_winner(match_played)
+                    response = self.ask_and_store_number()
 
+                    if response[1] in [1, 2]:   # One player won
+                        match_played.players[response[1]-1].win()
+                        match_played.win(match_played.players[response[1]-1])
 
-                if response[1] in [1, 2]:   # One player won
-                    match_played.players[response[1]-1].win()
-                    match_played.win(match_played.players[response[1]-1])
+                    elif response[1] == 3:       # Result = Equality
+                        match_played.players[0].equality()
+                        match_played.players[1].equality()
+                        match_played.win()
 
-                elif response[1] == 3:       # Result = Equality
-                    match_played.players[0].equality()
-                    match_played.players[1].equality()
+                    # We add to the has_met attribute of the player the opponent he has just faced.
+                    match_played.players[0].add_meet(match_played.players[1].uuid)
+                    match_played.players[1].add_meet(match_played.players[0].uuid)
 
-                # We add to the has_met attribute of the player the opponent he has just faced.
-                match_played.players[0].add_meet(match_played.players[1].uuid)
-                match_played.players[1].add_meet(match_played.players[0].uuid)
-
-            else:   # Si le match a déjà un résultat d'enregistré => Alerter l'utilisateur
-                self.view_menu.stand_by_msg("Le match sélectionné à déjà été clos")
+                else:   # Si le match a déjà un résultat d'enregistré => Alerter l'utilisateur
+                    self.view_menu.stand_by_msg("Le match sélectionné à déjà été clos")
 
     def start_new_round(self):
         """
         Method to start a new round.
         """
-        # TODO : Lors du démarrage du nouveau Round, on doit clôturer l'actuel et initialiser le nouveau
-        # Il faut aussi vérifier que les résultats de tous les matchs ont bien été renseigné
-
-        if self.round.start != "" and self.round.end == "":     # If the old round is not finished ==> Error
-            self.view_menu.stand_by_msg("Attention, le précédent round n'est pas fini !")
-        else:
-            self.tournament.add_round()
-            self.round = self.tournament.rounds[-1]
+        self.tournament.add_round()
+        self.round = self.tournament.rounds[-1]
+        self.tournament.save()
 
     def stop_round(self):
         """
         Method of informing the end of the round.
         """
-        # TODO : Lors de l'appel a cette fonction, on pourrait
-        #  controller l'état des matchs. Si non renseigné => On test
         if self.round.start != "":
             self.round.end_round()
-        else:
-            self.view_menu.stand_by_msg("Commencer par démarrer un round !!!!")

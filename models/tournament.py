@@ -25,7 +25,7 @@ class Tournament:
 
     def __init__(self, identity: str = None, name: str = "Tournament d'échec", location: str = None,
                  tournament_date: str = None, description: str = None,
-                 timer: str = TIMER, rounds: list[Round] = None, rounds_number: int = None):
+                 timer: str = TIMER, rounds: list[Round] = None, max_rounds_number: int = NB_ROUND):
 
         if isinstance(identity, str) and identity is not None:
             self.id = identity
@@ -55,10 +55,8 @@ class Tournament:
             self.description = self.DESCRIPTION
         self.rounds = []
 
-        if rounds_number:
-            self.rounds_number = rounds_number
-        else:
-            self.rounds_number = 0
+        if isinstance(max_rounds_number, int) and max_rounds_number is not None:
+            self.max_rounds_number = max_rounds_number
 
         if rounds:
             for data in rounds:
@@ -101,6 +99,7 @@ class Tournament:
         Method of loading a backup tournament
         """
         Player.initialise_players_data()
+        Player.load_players()
         data_load = cls.table_tournoi.all()
 
         data_load = data_load[-1]
@@ -114,7 +113,7 @@ class Tournament:
         t['tournament_date'] = data_load['tournament_date']
         t['timer'] = data_load['timer']
         t['description'] = data_load['description']
-        t['rounds_number'] = data_load['rounds_number']
+        t['max_rounds_number'] = data_load['max_rounds_number']
 
         tournament = Tournament(t['identity'],
                                 t['name'],
@@ -122,7 +121,7 @@ class Tournament:
                                 t['tournament_date'],
                                 t['description'],
                                 t['timer'],
-                                rounds_number=t['rounds_number'])
+                                max_rounds_number=t['max_rounds_number'])
 
         # --------- Load Objet Player ---------------
 
@@ -189,9 +188,8 @@ class Tournament:
         Method to add a round in tournament
         """
         player = Player.list_player_tournament()
-        r = Round(round_number=self.rounds_number + 1, players=player)
+        r = Round(round_number=len(self.rounds) + 1, players=player)
         self.rounds.append(r)
-        self.rounds_number += 1
 
     @property
     def current_round(self):

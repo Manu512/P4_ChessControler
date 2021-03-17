@@ -18,7 +18,7 @@ class Match:
         """
         return str((self.players, self.score))
 
-    def win(self, player: Player):
+    def win(self, player: Player = None):
         """
         Method to fill in the score of the match and add the points.
         :param player: str

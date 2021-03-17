@@ -14,7 +14,10 @@ if __name__ == '__main__':
         while True:
             tournament.menu_accueil()
     except Exception as exc:
-        logging.error(f"Problem with execution. Msg : {exc}")
+        print(type(exc))  # the exception instance
+        print(exc.args)  # arguments stored in .args
+        print(exc)
+
     finally:
         print("\n" * 10)
         print("Merci d'etre passé ;o)")
