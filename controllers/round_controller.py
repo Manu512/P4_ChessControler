@@ -19,7 +19,6 @@ class RoundController(BaseController):
         """
         super().__init__(tournament)
         self.round = tournament.rounds[-1]
-        self.menu_round()
 
     def menu_round(self):
         """
@@ -36,7 +35,7 @@ class RoundController(BaseController):
                 9: (str("back"), 'Retour au menu')}
 
         if self.round.end is None:
-            menu[6] = (self.stop_round, f'Le round {self.round.number} est fini')
+            menu[6] = (self.stop_round, f'Déclarer le round {self.round.number} fini')
         else:
             result = [match.score for match in self.round.matches if match.score is None]
             if result:
@@ -47,16 +46,15 @@ class RoundController(BaseController):
         r = self.ask_and_launch(menu=menu)
 
         if r:
-            pass
+            return False
         else:
-            self.menu_round()
+            return True
 
     def display_list_round_matchs(self):
         """
         Method that calls up the view displaying the matches of the current round
         """
         self.view_menu.view_matchs(self.round)
-        self.menu_round()
 
     def add_score(self):
         """
@@ -111,5 +109,3 @@ class RoundController(BaseController):
             self.round.end_round()
         else:
             self.view_menu.stand_by_msg("Commencer par démarrer un round !!!!")
-
-        self.menu_round()

@@ -16,6 +16,7 @@ class Controller(BaseController):
     def __init__(self):
         super().__init__()
         Player.load_players()
+        self.report = ReportController()
 
     def menu_accueil(self):
         """
@@ -24,7 +25,7 @@ class Controller(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
         menu = {1: (self.menu_tournament, "Gestion tournoi"),
                 2: (self.menu_players, "Gestion des joueurs"),
-                3: (ReportController, "Affichage des rapports"),
+                3: (self.report.menu_rapport, "Affichage des rapports"),
                 9: (exit, "Sortie")}
 
         self.view_menu.display_menu(title=title, question=menu)
@@ -231,14 +232,41 @@ class Controller(BaseController):
         """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de paramétrage du timer du tournoi."
-        menu = {1: (Tournament.set_timer_bullet, "BULLET"),
-                2: (Tournament.set_timer_blitz, "BLITZ"),
-                3: (Tournament.set_timer_fast, "COUP RAPIDE"),
+        menu = {1: (self.set_timer_bullet, "BULLET"),
+                2: (self.set_timer_blitz, "BLITZ"),
+                3: (self.set_timer_fast, "COUP RAPIDE"),
                 9: (self.menu_tournament, 'Retour Accueil Tournament')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         self.ask_and_launch(menu=menu)
+
+    def set_timer_bullet(self):
+        """
+        Method to set the timer attribute to Bullet.
+        """
+        if self.tournament is None:
+            Tournament.TIMER = "Bullet"
+        else:
+            self.tournament.set_timer_bullet()
+
+    def set_timer_blitz(self):
+        """
+        Method to set the timer attribute to Blitz.
+        """
+        if self.tournament is None:
+            Tournament.TIMER = "Blitz"
+        else:
+            self.tournament.set_timer_blitz()
+
+    def set_timer_fast(self):
+        """
+        Method to set the timer attribute to Fast.
+        """
+        if self.tournament is None:
+            Tournament.TIMER = "Coup Rapide"
+        else:
+            self.tournament.set_timer_fast()
 
     def change_location(self):
         """
@@ -265,13 +293,15 @@ class Controller(BaseController):
         Method for initiating a new tournament
         """
         Player.initialise_players_data()
-        self.tournament = Tournament()
+        super().tournament = Tournament()
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()
 
     def switch_rctournament(self):
-        RoundController(self.tournament)
+        ret = True
+        while ret:
+            ret = RoundController(self.tournament).menu_round()
 
     def load_tournament(self):
         """

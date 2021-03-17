@@ -13,7 +13,6 @@ class ReportController(BaseController):
 
     def __init__(self):
         super().__init__()
-        self.menu_rapport()
 
     def menu_rapport(self):
         """
@@ -51,7 +50,6 @@ class ReportController(BaseController):
         data = Player.list_all_player()
         data.sort(key=lambda x: x.name)
         self.view_menu.display_data(title, subtitle, data)
-        self.menu_rapport()
 
     def list_tournament_players_sort_alpha(self):
         """
@@ -62,7 +60,6 @@ class ReportController(BaseController):
         data = Player.list_player_tournament()
         data.sort(key=lambda x: x.name)
         self.view_menu.display_data(title, subtitle, data)
-        self.menu_rapport()
 
     def list_all_players_sort_elo(self):
         """
@@ -73,7 +70,6 @@ class ReportController(BaseController):
         data = Player.list_all_player()
         data.sort(key=lambda x: int(x.elo))
         self.view_menu.display_data(title, subtitle, data)
-        self.menu_rapport()
 
     def list_tournament_players_sort_elo(self):
         """
@@ -84,7 +80,6 @@ class ReportController(BaseController):
         data = Player.list_player_tournament()
         data.sort(key=lambda x: int(x.elo))
         self.view_menu.display_data(title, subtitle, data)
-        self.menu_rapport()
 
     def list_tournaments(self):
         """
