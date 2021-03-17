@@ -66,7 +66,7 @@ class Controller(BaseController):
                 9: (self.menu_accueil, 'Retour Accueil')}
 
         if self.tournament is not None:
-            del menu[6]
+            menu[6] = (self.stop_tournament, "Arrêter le tournoi (attention sauvegarder avant !!!)")
             menu[8] = (self.save_tournament, "Sauvegarder tournoi en cours")
         else:
             del menu[7]
@@ -261,6 +261,9 @@ class Controller(BaseController):
             self.add_description()
 
     def create_tournament(self):
+        """
+        Method for initiating a new tournament
+        """
         Player.initialise_players_data()
         self.tournament = Tournament()
         self.tournament.add_round()
@@ -271,9 +274,21 @@ class Controller(BaseController):
         RoundController(self.tournament)
 
     def load_tournament(self):
+        """
+        Method to load a tournament
+        """
         self.tournament = Tournament.load()
         self.round = self.tournament.rounds[-1]
         self.switch_rctournament()
 
     def save_tournament(self):
+        """
+        Method to save the tournament
+        """
         self.tournament.save()
+
+    def stop_tournament(self):
+        """
+        Method for deleting the tournament attribute
+        """
+        self.tournament = None

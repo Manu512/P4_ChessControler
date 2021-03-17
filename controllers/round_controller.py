@@ -29,17 +29,24 @@ class RoundController(BaseController):
         subtitle = "Console de gestion des rounds du tournoi."
         menu = {1: (self.menu_round, f"Nom : {self.round.name}"),
                 2: (self.menu_round, f"Début du Round : {self.round.start}"),
-                3: (self.stop_round, f"Fin du Round : {self.round.end}"),
+                3: (self.menu_round, f"Fin du Round : {self.round.end}"),
                 4: (self.display_list_round_matchs, 'Consulter les matches en cours'),
                 5: (self.add_score, f"Saisir les scores du Round {self.round.number}"),
                 6: (self.start_new_round, 'Démarrer nouveau Round'),
-                9: (self.back_menu, 'Retour au menu')}
+                9: (str("back"), 'Retour au menu')}
+
+        if self.round.end is None:
+            menu[6] = (self.stop_round, f'Le round {self.round.number} est fini')
+        else:
+            result = [match.score for match in self.round.matches if match.score is None]
+            if result:
+                menu[6] = (self.add_score, f'{len(result)} score reste à saisir pour démarrer le prochain round')
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
-        self.ask_and_launch(menu=menu)
+        r = self.ask_and_launch(menu=menu)
 
-        if self.back_menu():
+        if r:
             pass
         else:
             self.menu_round()
@@ -56,25 +63,30 @@ class RoundController(BaseController):
         Method that calls up the view that informs the winners of the different matches
         """
         self.view_menu.select_match(self.round)
-        response = self.ask_and_store_number("Choisissez le match pour renseigner le résultat :")
+        response = self.ask_and_store_number("Choisissez le match pour renseigner le vainqueur :")
 
         if response[0]:     # response = tuple(False/True if valid input, input value)
             match_played = self.round.matches[response[1]-1]
-            self.view_menu.select_winner(match_played)
-            response = self.ask_and_store_number()
 
-            if response[1] in [1, 2]:   # One player won
-                match_played.players[response[1]-1].win()
-                match_played.win(match_played.players[response[1]-1])
-                print(f"Le gagnant est !!!! {match_played.players[response[1]-1]}")
-            else:       # Result = Equality
-                match_played.players[0].equality()
-                match_played.players[1].equality()
-                match_played.win()
+            if match_played.score is None:
+                self.view_menu.select_winner(match_played)
+                response = self.ask_and_store_number()
 
-            # We add to the has_met attribute of the player the opponent he has just faced.
-            match_played.players[0].add_meet(match_played.players[1].uuid)
-            match_played.players[1].add_meet(match_played.players[0].uuid)
+
+                if response[1] in [1, 2]:   # One player won
+                    match_played.players[response[1]-1].win()
+                    match_played.win(match_played.players[response[1]-1])
+
+                elif response[1] == 3:       # Result = Equality
+                    match_played.players[0].equality()
+                    match_played.players[1].equality()
+
+                # We add to the has_met attribute of the player the opponent he has just faced.
+                match_played.players[0].add_meet(match_played.players[1].uuid)
+                match_played.players[1].add_meet(match_played.players[0].uuid)
+
+            else:   # Si le match a déjà un résultat d'enregistré => Alerter l'utilisateur
+                self.view_menu.stand_by_msg("Le match sélectionné à déjà été clos")
 
     def start_new_round(self):
         """

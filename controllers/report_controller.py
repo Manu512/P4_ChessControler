@@ -29,13 +29,13 @@ class ReportController(BaseController):
                 5: (self.list_tournaments, "Liste de tous les tournois"),
                 6: (self.list_all_rounds, "Liste de tous les tours du tournoi"),
                 7: (self.list_all_matchs, "Liste de tous les matches du tournoi"),
-                9: (self.back_menu, "Retour")}
+                9: ("back", "Retour")}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
-        self.ask_and_launch(menu=menu)
+        r = self.ask_and_launch(menu=menu)
 
-        if self.back_menu():
+        if r:
             pass
         else:
             self.menu_rapport()

@@ -26,7 +26,7 @@ class BaseController:
         """
         return True
 
-    def ask_and_launch(self, ask_input="Votre choix : ", *, menu: dict):
+    def ask_and_launch(self, ask_input="Votre choix : ", *, menu: dict) -> bool:
         """
         Method for interacting with the user, controlling their response
         and define the sequence of events. According to the menus that are
@@ -46,8 +46,9 @@ class BaseController:
                 user_input = int(user_input)
             except ValueError:
                 self.ask_and_launch(ask_input, menu=menu)
-
-            if self.check_choice(list(menu.keys()), user_input):
+            if menu[user_input][0] == "back":
+                return True
+            elif self.check_choice(list(menu.keys()), user_input):
                 menu[user_input][0]()
             else:
                 self.ask_and_launch(ask_input, menu=menu_to_analyse)
@@ -78,10 +79,7 @@ class BaseController:
         """
         user_input = self.view_menu.input(ask_input)
 
-        if self._control_user_input('text', user_input):
-            ret = True
-        else:
-            ret = False
+        ret = bool(self._control_user_input('text', user_input))
 
         return ret, user_input
 

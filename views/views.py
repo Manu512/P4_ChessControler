@@ -80,6 +80,7 @@ class Display:
                 print("\t{} vs {} : En attente du résultat".format(match.players[0].fullname,
                                                                    match.players[1].fullname))
         print("\n" * 5)
+        self.stand_by_msg()
 
     def select_match(self, rounds):
         """
@@ -121,7 +122,7 @@ class Display:
         print("\n" * 5)
 
     @staticmethod
-    def stand_by_msg(msg: str):
+    def stand_by_msg(msg: str = ""):
         """
         Call method to display an error message and request a keystroke to continue.
         Args:
