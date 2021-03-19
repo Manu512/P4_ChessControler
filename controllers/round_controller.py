@@ -5,6 +5,8 @@ from controllers import BaseController
 
 from models.tournament import Tournament
 
+from models.players import Player
+
 
 class RoundController(BaseController):
     """
@@ -31,17 +33,19 @@ class RoundController(BaseController):
                 3: (self.menu_round, f"Fin du Round : {self.round.end}"),
                 4: (self.display_list_round_matchs, 'Consulter les matches en cours'),
                 5: (self.add_score, f"Saisir les scores du Round {self.round.number}"),
-                6: (self.start_new_round, 'Démarrer nouveau Round'),
-                9: (str("back"), 'Retour au menu')}
+                6: (self.start_new_round, 'Démarrer un nouveau Round'),
+                9: (str('back'), 'Retour au menu')}
 
         if self.round.end is None:
             menu[6] = (self.stop_round, f'Déclarer le round {self.round.number} fini')
         elif self.round.number <= self.tournament.max_rounds_number:
             result = [match.score for match in self.round.matches if match.score is None]
             if len(result):
-                menu[6] = (self.add_score, f'{len(result)} score reste à saisir pour démarrer le prochain round')
+                menu[6] = (self.add_score, f'{len(result)} score reste à saisir '
+                                           f'pour pouvoir démarrer le prochain round')
             elif len(result) == 0 and self.round.number == self.tournament.max_rounds_number:
-                menu[6] = (self.view_result, "Tournoi terminé / Affiché les résultats")
+                self.tournament.save()
+                menu[6] = (self.view_result, "Tournoi terminé - Affiché les résultats")
             elif len(result) == 0 and self.round.number < self.tournament.max_rounds_number:
                 menu[4] = (self.display_list_round_matchs, 'Consulter les résultats des matchs')
                 del menu[5]
@@ -51,9 +55,11 @@ class RoundController(BaseController):
         r = self.ask_and_launch(menu=menu)
 
         if r:
-            return False
+            ret = False
         else:
-            return True
+            ret = True
+
+        return ret
 
     def display_list_round_matchs(self):
         """
@@ -106,3 +112,22 @@ class RoundController(BaseController):
         """
         if self.round.start != "":
             self.round.end_round()
+
+    def view_result(self):
+        """
+        Méthode qui affiche le résultat du tournoi.
+
+        Returns:
+
+        """
+
+        p = Player.list_player_tournament()
+        p.sort(reverse=True, key=lambda x: (int(x.point), int(x.elo)))
+        data = []
+        for n, player in enumerate(p):
+            data.append(f"{player.fullname} ({player.age} ans) avec {player.point} points, classement ELO : {player.elo})")
+
+        title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
+        subtitle = "Résultat du tournoi."
+
+        self.view_menu.display_data(title, subtitle, data)

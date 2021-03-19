@@ -1,1 +1,112 @@
-{"players": {"1": {"name": "WALDNER", "first_name": "Emmanuel", "dob": "18/06/1980", "_genre": "H", "elo": 1200, "point": 1, "has_met": ["53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887", "53ff7e62-d2be-42b7-86f9-738454b68887"], "status": true, "id": 1, "uuid": "f7bac1ac-8162-43c6-9bb9-22f327f479ae"}, "2": {"name": "WALDNER", "first_name": "Bernard", "dob": "26/01/1950", "_genre": "H", "elo": 0, "point": 0, "has_met": [], "status": true, "id": 2, "uuid": "b0326567-39b5-4686-be29-3e00aa52f930"}, "3": {"name": "WALDNER", "first_name": "Rapha\u00ebl", "dob": "17/08/2018", "_genre": "H", "elo": 0, "point": 0, "has_met": ["f7bd6725-3216-4bf2-9a83-0bef9b1c5c36", "f7bd6725-3216-4bf2-9a83-0bef9b1c5c36"], "status": true, "id": 3, "uuid": "ce46672a-1043-455b-af91-d21176c56a87"}, "4": {"name": "BREDERECK", "first_name": "Estelle", "dob": "05/07/1982", "_genre": "F", "elo": 0, "point": 0, "has_met": ["46f66e24-5d8a-49f3-83ee-87646a23a358"], "status": true, "id": 4, "uuid": "c5deb579-40b8-4d4f-ba04-5b69bb7c0192"}, "5": {"name": "WALDNER", "first_name": "Eliane", "dob": "18/04/1953", "_genre": "F", "elo": 0, "point": 0, "has_met": ["f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae", "f7bac1ac-8162-43c6-9bb9-22f327f479ae"], "status": true, "id": 5, "uuid": "53ff7e62-d2be-42b7-86f9-738454b68887"}, "6": {"name": "BREDERECK", "first_name": "L\u00e9on", "dob": "03/05/1953", "_genre": "H", "elo": 0, "point": 0, "has_met": [], "status": true, "id": 6, "uuid": "a3e61bb3-c52e-4c99-8fb1-8c5e994f908a"}, "7": {"name": "WITZ", "first_name": "Manuel", "dob": "05/08/1971", "_genre": "H", "elo": "1050", "point": 1, "has_met": ["c5deb579-40b8-4d4f-ba04-5b69bb7c0192"], "status": true, "id": 7, "uuid": "46f66e24-5d8a-49f3-83ee-87646a23a358"}, "8": {"name": "PFIRSCH", "first_name": "Bernadette", "dob": "03/05/1959", "_genre": "F", "elo": 0, "point": 1, "has_met": ["ce46672a-1043-455b-af91-d21176c56a87", "ce46672a-1043-455b-af91-d21176c56a87"], "status": true, "id": 8, "uuid": "f7bd6725-3216-4bf2-9a83-0bef9b1c5c36"}, "9": {"name": "RAOULT", "first_name": "Didier", "dob": "05/05/1960", "_genre": "H", "elo": "500", "point": 0, "has_met": [], "status": false, "id": 9, "uuid": "c82c0408-61d5-4506-838e-6190b453d64d"}}}
+{
+    "players": {
+        "1": {
+            "_genre": "F",
+            "dob": "05/07/1982",
+            "elo": 0,
+            "first_name": "Estelle",
+            "has_met": [],
+            "id": 4,
+            "name": "BREDERECK",
+            "point": 0,
+            "status": false,
+            "uuid": "c5deb579-40b8-4d4f-ba04-5b69bb7c0192"
+        },
+        "2": {
+            "_genre": "H",
+            "dob": "03/05/1953",
+            "elo": 0,
+            "first_name": "L\u00e9on",
+            "has_met": [],
+            "id": 6,
+            "name": "BREDERECK",
+            "point": 0,
+            "status": false,
+            "uuid": "a3e61bb3-c52e-4c99-8fb1-8c5e994f908a"
+        },
+        "3": {
+            "_genre": "F",
+            "dob": "03/05/1959",
+            "elo": 0,
+            "first_name": "Bernadette",
+            "has_met": [],
+            "id": 8,
+            "name": "PFIRSCH",
+            "point": 0,
+            "status": false,
+            "uuid": "f7bd6725-3216-4bf2-9a83-0bef9b1c5c36"
+        },
+        "4": {
+            "_genre": "H",
+            "dob": "05/05/1960",
+            "elo": "500",
+            "first_name": "Didier",
+            "has_met": [],
+            "id": 9,
+            "name": "RAOULT",
+            "point": 0,
+            "status": false,
+            "uuid": "c82c0408-61d5-4506-838e-6190b453d64d"
+        },
+        "5": {
+            "_genre": "H",
+            "dob": "18/06/1980",
+            "elo": 1200,
+            "first_name": "Emmanuel",
+            "has_met": [],
+            "id": 1,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "f7bac1ac-8162-43c6-9bb9-22f327f479ae"
+        },
+        "6": {
+            "_genre": "H",
+            "dob": "26/01/1950",
+            "elo": 0,
+            "first_name": "Bernard",
+            "has_met": [],
+            "id": 2,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "b0326567-39b5-4686-be29-3e00aa52f930"
+        },
+        "7": {
+            "_genre": "H",
+            "dob": "17/08/2018",
+            "elo": 0,
+            "first_name": "Rapha\u00ebl",
+            "has_met": [],
+            "id": 3,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "ce46672a-1043-455b-af91-d21176c56a87"
+        },
+        "8": {
+            "_genre": "F",
+            "dob": "18/04/1953",
+            "elo": 0,
+            "first_name": "Eliane",
+            "has_met": [],
+            "id": 5,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "53ff7e62-d2be-42b7-86f9-738454b68887"
+        },
+        "9": {
+            "_genre": "H",
+            "dob": "05/08/1971",
+            "elo": "1050",
+            "first_name": "Manuel",
+            "has_met": [],
+            "id": 7,
+            "name": "WITZ",
+            "point": 0,
+            "status": false,
+            "uuid": "46f66e24-5d8a-49f3-83ee-87646a23a358"
+        }
+    }
+}

@@ -4,6 +4,7 @@ from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
+from tinydb.operations import delete
 
 from models.rounds import Round
 from models.players import Player
@@ -13,7 +14,7 @@ class Tournament:
     """
     Purpose Enabling the control and monitoring of tournament.
     """
-    __db = TinyDB('tournament.json')
+    __db = TinyDB('tournament.json', sort_keys=True, indent=4, separators=(',', ': '))
     table_tournoi = __db.table('tournament')
 
     NAME = "Tournament d'échec"
@@ -23,7 +24,7 @@ class Tournament:
     DESCRIPTION = ""
     LOCATION = 'France'
 
-    def __init__(self, identity: str = None, name: str = "Tournament d'échec", location: str = None,
+    def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = None,
                  tournament_date: str = None, description: str = None,
                  timer: str = TIMER, rounds: list[Round] = None, max_rounds_number: int = NB_ROUND):
 
@@ -58,27 +59,37 @@ class Tournament:
         if isinstance(max_rounds_number, int) and max_rounds_number is not None:
             self.max_rounds_number = max_rounds_number
 
-        if rounds:
-            for data in rounds:
-                round = Round(**data)
-                self.rounds.append(round)
+        # if rounds:
+        #     for data in rounds:
+        #         round = Round(**data)
+        #         self.rounds.append(round)
 
     def save(self):
         """
         Method of saving data in JSON format with TinyDB
         """
-        q = Query()
 
         data = self.__dict__.copy()
+
+        q = Query()
+        # On efface l'ancienne liste des joueurs du tournoi pour la mettre a jour ensuite.
+        self.table_tournoi.update(delete('players'), q.id == self.id)
+
+        # On serialize les données joueurs
+        d_players = []
+
+        for player in data['rounds'][0].players:
+            player_data = player.uuid, player.point, player.has_met
+            d_players.append(player_data)
+        data['players'] = d_players
+
+        # On serialize les données rounds
         del data["rounds"]
         data_round = []
+
         for round in self.rounds:
             r = {'id': round.id, 'name': round.name, 'number': round.number, 'start': round.start, 'end': round.end}
             data_round.append(r)
-            data_players = []
-            for player in round.players:
-                player_data = player.uuid, player.point, player.has_met
-                data_players.append(player_data)
             data_matches = []
             for match in round.matches:
                 if isinstance(match.score, list):
@@ -88,8 +99,9 @@ class Tournament:
                     match_serialize = ([match.players[0].uuid, match.players[1].uuid], None)
                 data_matches.append(match_serialize)
             data_round.append({"matches": data_matches})
-            data["players"] = data_players
+
         data["rounds"] = data_round
+
         self.table_tournoi.upsert(data, q.id == self.id)
         return self
 
@@ -100,6 +112,7 @@ class Tournament:
         """
         Player.initialise_players_data()
         Player.load_players()
+        Player.all_players_inactive()
         data_load = cls.table_tournoi.all()
 
         data_load = data_load[-1]
@@ -138,6 +151,7 @@ class Tournament:
 
             p_found = p_found[0]
 
+            p_found.status = True
             # p_found.switch_player_tournament()
             p_found.point = player[1]
             for meet in player[2]:
@@ -186,14 +200,8 @@ class Tournament:
     def add_round(self):
         """
         Method to add a round in tournament
+        Returns: Object Round
         """
-        player = Player.list_player_tournament()
-        r = Round(round_number=len(self.rounds) + 1, players=player)
+        r = Round(round_number=len(self.rounds) + 1, players=Player.list_player_tournament())
         self.rounds.append(r)
-
-    @property
-    def current_round(self):
-        """
-        Property displaying the name of the current round.
-        """
-        return self.rounds[-1].name
+        return r

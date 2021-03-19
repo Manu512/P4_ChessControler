@@ -28,16 +28,18 @@ class ReportController(BaseController):
                 5: (self.list_tournaments, "Liste de tous les tournois"),
                 6: (self.list_all_rounds, "Liste de tous les tours du tournoi"),
                 7: (self.list_all_matchs, "Liste de tous les matches du tournoi"),
-                9: ("back", "Retour")}
+                9: (str('back'), 'Retour au menu')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         r = self.ask_and_launch(menu=menu)
 
         if r:
-            pass
+            ret = False
         else:
-            self.menu_rapport()
+            ret = True
+
+        return ret
 
     # --------------------------RAPPORT METHODS------------------------------------
 
@@ -48,7 +50,7 @@ class ReportController(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Listing des joueurs :"
         data = Player.list_all_player()
-        data.sort(key=lambda x: x.name)
+        data.sort(key=lambda x: (x.name, x.first_name))
         self.view_menu.display_data(title, subtitle, data)
 
     def list_tournament_players_sort_alpha(self):
@@ -58,7 +60,7 @@ class ReportController(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Listing des joueurs du tournoi :"
         data = Player.list_player_tournament()
-        data.sort(key=lambda x: x.name)
+        data.sort(key=lambda x: (x.name, x.first_name))
         self.view_menu.display_data(title, subtitle, data)
 
     def list_all_players_sort_elo(self):
@@ -68,7 +70,7 @@ class ReportController(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Listing des joueurs :"
         data = Player.list_all_player()
-        data.sort(key=lambda x: int(x.elo))
+        data.sort(reverse=True, key=lambda x: int(x.elo))
         self.view_menu.display_data(title, subtitle, data)
 
     def list_tournament_players_sort_elo(self):
@@ -78,7 +80,7 @@ class ReportController(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Listing des joueurs du tournoi :"
         data = Player.list_player_tournament()
-        data.sort(key=lambda x: int(x.elo))
+        data.sort(reverse=True, key=lambda x: int(x.elo))
         self.view_menu.display_data(title, subtitle, data)
 
     def list_tournaments(self):

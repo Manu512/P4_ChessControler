@@ -16,7 +16,6 @@ class Controller(BaseController):
     def __init__(self):
         super().__init__()
         Player.load_players()
-        self.report = ReportController()
 
     def menu_accueil(self):
         """
@@ -25,7 +24,7 @@ class Controller(BaseController):
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
         menu = {1: (self.menu_tournament, "Gestion tournoi"),
                 2: (self.menu_players, "Gestion des joueurs"),
-                3: (self.report.menu_rapport, "Affichage des rapports"),
+                3: (self.launch_menu_report, "Affichage des rapports"),
                 9: (exit, "Sortie")}
 
         self.view_menu.display_menu(title=title, question=menu)
@@ -43,6 +42,7 @@ class Controller(BaseController):
                 2: (self.update_player_elo, "Modifier le classement ELO d'un joueur"),
                 3: (self.add_player_tournament, "Ajouter un joueur au tournoi actuel"),
                 4: (self.remove_player_tournament, "Supprimer un joueur du tournoi actuel"),
+                5: (self.remove_all_player_tournament, "Supprimer tous les joueurs du tournoi actuel"),
                 9: (self.menu_accueil, "Retour")}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
@@ -62,7 +62,7 @@ class Controller(BaseController):
                 4: (self.change_location, f"Localisation : {Tournament.LOCATION}"),
                 5: (self.add_description, f"Description : {Tournament.DESCRIPTION}"),
                 6: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
-                7: (self.switch_rctournament, "Gestion des rounds"),
+                7: (self.launch_menu_round, "Gestion des rounds"),
                 8: (self.load_tournament, "Charger un tournoi sauvegardé"),
                 9: (self.menu_accueil, 'Retour Accueil')}
 
@@ -182,6 +182,14 @@ class Controller(BaseController):
                     player.switch_player_tournament()
                     Player.save_all_players()
 
+    @staticmethod
+    def remove_all_player_tournament():
+        """
+        Appel de la methode pour désinscrire tout les joueurs.
+        """
+        Player.all_players_inactive()
+        Player.save_all_players()
+
     def found_specific_player(self) -> Player:
         """
         Method that will search for a player based on his Last Name and First Name.
@@ -296,12 +304,17 @@ class Controller(BaseController):
         super().__init__(Tournament())
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
-        self.switch_rctournament()
+        self.launch_menu_round()
 
-    def switch_rctournament(self):
+    def launch_menu_round(self):
         ret = True
         while ret:
             ret = RoundController(self.tournament).menu_round()
+
+    def launch_menu_report(self):
+        ret = True
+        while ret:
+            ret = ReportController().menu_rapport()
 
     def load_tournament(self):
         """
@@ -309,7 +322,7 @@ class Controller(BaseController):
         """
         self.tournament = Tournament.load()
         self.round = self.tournament.rounds[-1]
-        self.switch_rctournament()
+        self.launch_menu_round()
 
     def save_tournament(self):
         """

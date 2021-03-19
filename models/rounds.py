@@ -85,6 +85,7 @@ class Round:
         return players
 
     def __define_matchs_in_round(self) -> list:
+
         matches = []
         if self.number == 1:    # Definition of first round matches
             self.players = self.sort_player(self.players, False)
@@ -126,16 +127,25 @@ class Round:
             while len(free_players):
                 player1 = free_players.pop()
                 available_opponent = free_players.copy()
-                player_to_remove = []
+
                 for opponent_player in available_opponent:
-                    if opponent_player.uuid in player1.has_met:
-                        player_to_remove.append(opponent_player)
+                    if opponent_player.uuid not in player1.has_met:
+                        player2 = opponent_player
+                        free_players.remove(player2)
+                        matches.append(Match([player1, player2]))
+                        break
 
-                for each_player in player_to_remove:
-                    available_opponent.remove(each_player)
+                #
+                # for opponent_player in available_opponent:
+                #     if opponent_player.uuid in player1.has_met:
+                #         player_already_meet.append(opponent_player)
+                #
+                # for each_player in player_already_meet:
+                #     available_opponent.remove(each_player)
+                #
+                # player2 = available_opponent.pop()
+                # free_players.remove(player2)
+                #
 
-                player2 = available_opponent.pop()
-
-                matches.append(Match([player1, player2]))
 
         return matches

@@ -5,6 +5,7 @@ from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
+from tinydb.operations import delete
 
 
 class Player:
@@ -36,6 +37,7 @@ class Player:
 
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
+
         self._PLAYERS.append(self)
 
     def __repr__(self):
@@ -50,6 +52,14 @@ class Player:
         players_table = self.__db
         player_data = self.__serialize_player()
         players_table.upsert(player_data, q.uuid == self.uuid)
+
+    @classmethod
+    def all_players_inactive(cls):
+        """
+        Methode pour désinscrire tous les joueurs du tournoi
+        """
+        [player.switch_player_tournament() for player in cls._PLAYERS if player.status]
+
 
     @property
     def age(self) -> int:
@@ -107,9 +117,8 @@ class Player:
 
         :param player: str id of the opponent.
         """
-        self.has_met = list(set(self.has_met))
         self.has_met.append(player)
-        self.update_player()
+        self.has_met = list(set(self.has_met))
 
     def switch_player_tournament(self):
         """Change le status du joueur dans le tournoi
@@ -165,6 +174,7 @@ class Player:
         Class method returning a list of player objects with an active status
         :return: list of the registered players
         """
+
         ret = [player for player in cls._PLAYERS if player.status]
         cls._NB_ACTIVE_PLAYERS = len(ret)
         return ret
