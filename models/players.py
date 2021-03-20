@@ -22,6 +22,14 @@ class Player:
     _NB_ACTIVE_PLAYERS = 0
     _PLAYERS = []
 
+    def __new__(cls, **kwargs):
+        for player in cls._PLAYERS:
+            if player.uuid == kwargs['uuid']:
+                return
+        self = super().__new__(cls)
+        self._PLAYERS.append(self)
+        return self
+
     def __init__(self, **kwargs):
         self.name = kwargs['name']
         self.first_name = kwargs['first_name']
@@ -38,7 +46,7 @@ class Player:
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
 
-        self._PLAYERS.append(self)
+    #self._PLAYERS.append(self)
 
     def __repr__(self):
         return "{} ({} ans) - Elo : {}".format(self.fullname, self.age, self.elo)
