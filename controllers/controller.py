@@ -172,11 +172,11 @@ class Controller(BaseController):
         player = self.found_specific_player()
         if player is not None:
             if not player.status:
-                self.view_menu.stand_by_msg("Attention {} {} est déjà inscrit au "
+                self.view_menu.stand_by_msg("Attention {} {} n'est pas inscrit au "
                                             "tournoi".format(player.name, player.first_name))
             else:
                 valid = self.ask_and_store_text("Confirmez vous que {} {} "
-                                                "participe plus au tournoi ? (O/N)"
+                                                "ne participe plus au tournoi ? (O/N)"
                                                 .format(player.name, player.first_name))
                 if valid[0]:
                     player.switch_player_tournament()
