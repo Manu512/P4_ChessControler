@@ -54,12 +54,7 @@ class RoundController(BaseController):
 
         r = self.ask_and_launch(menu=menu)
 
-        if r:
-            ret = False
-        else:
-            ret = True
-
-        return ret
+        return self.back_menu(r)
 
     def display_list_round_matchs(self):
         """

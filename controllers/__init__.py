@@ -19,12 +19,16 @@ class BaseController:
 
     # --------------------------GENERAL METHODS------------------------------------
 
-    @staticmethod
-    def back_menu():
+    def back_menu(self, arg: bool) -> bool:
         """
-        Method that returns True
+        Method that returns True to return in previous controller menu
         """
-        return True
+        if arg:
+            ret = False
+        else:
+            ret = True
+
+        return ret
 
     def ask_and_launch(self, ask_input="Votre choix : ", *, menu: dict) -> bool:
         """

@@ -11,8 +11,10 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == '__main__':
     tournament = Controller()
     try:
-        while True:
-            tournament.menu_accueil()
+        r = True
+        while r:
+            r = tournament.menu_accueil()
+
     except Exception as exc:
         print(type(exc))  # the exception instance
         print(exc.args)  # arguments stored in .args

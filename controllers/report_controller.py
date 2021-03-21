@@ -1,4 +1,4 @@
-""" Report Controller"""
+""" Report Menu Controller"""
 # coding:utf-8
 
 from controllers import BaseController
@@ -34,12 +34,7 @@ class ReportController(BaseController):
 
         r = self.ask_and_launch(menu=menu)
 
-        if r:
-            ret = False
-        else:
-            ret = True
-
-        return ret
+        return self.back_menu(r)
 
     # --------------------------RAPPORT METHODS------------------------------------
 
