@@ -23,10 +23,10 @@ class Round:
     """
 
     def __init__(self, round_number: int, players: list, start_date=None,
-                 end_date=None, matches: list = None, id: str = None):
+                 end_date=None, matches: list = None, uuid: str = None):
 
-        if isinstance(id, str) and id is not None:
-            self.id = id
+        if isinstance(uuid, str) and id is not None:
+            self.id = uuid
         else:
             self.id = str(uuid4())
 
@@ -91,10 +91,9 @@ class Round:
             self.players = self.sort_player(self.players, False)
             nb_joueur = len(self.players)
             if Player.isactiveplayerlistpair():
-                """
-                The list of players is divided by 2 and the 2 lists are linked together
-                for the 1st round matches
-                """
+                # The list of players is divided by 2 and the 2 lists are linked together
+                # for the 1st round matches
+
                 players_list_1 = self.players[:nb_joueur // 2]
                 players_list_2 = self.players[nb_joueur // 2:]
 
@@ -106,10 +105,8 @@ class Round:
 
             else:
                 print("Il manque un joueur pour générer toutes les paires")
-                """
-                On pourrait ajouter un joueur factice pour générer un match 'blanc'
-                Ce n'est pas preciser dans l'énoncé mais cela est envisageable.
-                """
+                # On pourrait ajouter un joueur factice pour générer un match 'blanc'
+                # Ce n'est pas preciser dans l'énoncé mais cela est envisageable.
 
         elif self.number == 2:  # Definition of the second round matches
 
@@ -146,6 +143,5 @@ class Round:
                 # player2 = available_opponent.pop()
                 # free_players.remove(player2)
                 #
-
 
         return matches

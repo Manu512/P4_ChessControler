@@ -26,14 +26,13 @@ class Controller(BaseController):
         menu = {1: (self.menu_tournament, "Gestion tournoi"),
                 2: (self.launch_menu_players, "Gestion des joueurs"),
                 3: (self.launch_menu_report, "Affichage des rapports"),
-                9: (str('back'), "Fin d'exécution")}
+                9: (str('back'), "Fin")}
 
         self.view_menu.display_menu(title=title, question=menu)
 
         r = self.ask_and_launch(menu=menu)
 
         return self.back_menu(r)
-
 
     def menu_tournament(self):
         """
@@ -60,7 +59,8 @@ class Controller(BaseController):
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
         r = self.ask_and_launch(menu=menu)
-        if self.back_menu(r): self.menu_tournament()
+        if self.back_menu(r):
+            self.menu_tournament()
 
     # --------------------------TOURNAMENTS METHODS--------------------------------
 

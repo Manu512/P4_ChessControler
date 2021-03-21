@@ -5,7 +5,6 @@ from datetime import datetime as dt
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
-from tinydb.operations import delete
 
 
 class Player:
@@ -46,8 +45,6 @@ class Player:
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
 
-    #self._PLAYERS.append(self)
-
     def __repr__(self):
         return "{} ({} ans) - Elo : {}".format(self.fullname, self.age, self.elo)
 
@@ -67,7 +64,6 @@ class Player:
         Methode pour désinscrire tous les joueurs du tournoi
         """
         [player.switch_player_tournament() for player in cls._PLAYERS if player.status]
-
 
     @property
     def age(self) -> int:
