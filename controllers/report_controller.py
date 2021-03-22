@@ -11,8 +11,9 @@ class ReportController(BaseController):
 
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, tournament):
+        super().__init__(tournament)
+
 
     def menu_rapport(self):
         """
@@ -91,10 +92,12 @@ class ReportController(BaseController):
         """
         Fonction qui va lancer le print de tous les rounds du tournois
         """
-        pass
+        self.view_menu.report_round_tournament(data=self.tournament.rounds)
+        self.view_menu.stand_by_msg()
 
     def list_all_matchs(self):
         """
         Fonction qui va lancer le print de la liste des matches du tournois
         """
-        pass
+        self.view_menu.report_matches_tournament(data=self.tournament.rounds)
+        self.view_menu.stand_by_msg()

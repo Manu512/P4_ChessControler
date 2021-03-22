@@ -136,11 +136,9 @@ class Tournament:
 
         t['players'] = data_load['players']
         for player in t['players']:
-            """
-            1 - On recherche le joueur ayant uuid stocker en player[0]
-            2 - On lui affecte le nombre de point stocker en player[1]
-            3 - On renseigne les rencontres existantes stocker en player[2]
-            """
+            # 1 - Search for the player with uuid stored in player[0].
+            # 2 - Assign the number of points stored in player[1]
+            # 3 - Fill in the existing matches store in player[2]
             p_found = [p for p in Player.PLAYERS if player[0] == p.uuid]
 
             assert p_found          # Raises an exception if the player is not found

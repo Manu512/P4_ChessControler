@@ -2,9 +2,10 @@
 # coding: utf-8
 
 import re
-from tinydb import TinyDB
-from typing import Union
+
 from datetime import datetime as dt
+from typing import Union
+from tinydb import TinyDB
 
 from views.views import Display
 
@@ -149,11 +150,15 @@ class BaseController:
         return True
 
     def load_saved_tournament(self) -> list:
+        """
+        Method to load serialized tournaments in JSON
+        Returns: list
+
+        """
         __db = TinyDB('tournament.json', sort_keys=True, indent=4, separators=(',', ': '))
         table_tournoi = __db.table('tournament')
         tournaments = table_tournoi.all()
         return tournaments
-    pass
 
     @staticmethod
     def __check_number_in_word(string: str):

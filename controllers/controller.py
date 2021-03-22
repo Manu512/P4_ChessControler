@@ -60,7 +60,7 @@ class Controller(BaseController):
         Menu which allows the setting of the tournament.
         """
         player_control = PlayerController()
-        player_active = ReportController().list_tournament_players_sort_alpha
+        player_active = ReportController(self.tournament)
 
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion du tournoi."
@@ -78,9 +78,9 @@ class Controller(BaseController):
                 9: (str('back'), 'Retour Accueil')}
 
         if Player.NB_ACTIVE_PLAYERS < Tournament.NB_DEFAULT_PLAYERS:
-            menu[8] = (player_active, 'Afficher la liste des participants')
+            menu[8] = (player_active.list_tournament_players_sort_alpha, 'Afficher la liste des participants')
         else:
-            menu[6] = (player_active, 'Afficher la liste des participants')
+            menu[6] = (player_active.list_tournament_players_sort_alpha, 'Afficher la liste des participants')
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
@@ -90,6 +90,12 @@ class Controller(BaseController):
     # --------------------------TOURNAMENTS METHODS--------------------------------
 
     def menu_select_saved_tournament(self):
+        """
+        Method for selecting the tournament to be loaded.
+        Returns:
+
+        """
+
         tournaments = self.load_saved_tournament()
         self.view_menu.view_saved_tournament(data=tournaments)
         ret = None
@@ -206,9 +212,10 @@ class Controller(BaseController):
         """
         ret = True
         while ret:
-            ret = ReportController().menu_rapport()
+            ret = ReportController(self.tournament).menu_rapport()
 
-    def launch_menu_players(self):
+    @classmethod
+    def launch_menu_players(cls):
         """
         Method for calling the Player Controller
         """

@@ -46,6 +46,7 @@ class Display:
         Method to display a menu.
 
         Args:
+            datas:
             title: str: Main title of the console
             subtitle: str: Subtitle of the console
 
@@ -63,9 +64,9 @@ class Display:
         Method to display tournament list.
 
         Args:
+            datas:
             title: str: Main title of the console
             subtitle: str: Subtitle of the console
-            question: dict{ int(Choice) : Tuple( method to launch, Text to display )}
         """
         self.clean()
         print(f"{title}")
@@ -159,11 +160,12 @@ class Display:
         return ret
 
     # ---------------- saved Tournament ---------------------------
-    def view_saved_tournament(self, subtitle = "Selection des sauvegardes :",* , data: dict):
+    def view_saved_tournament(self, subtitle="Selection des sauvegardes :", *, data: dict):
         """
         Method to display and select the winner of the match.
         Args:
-            match: obj(Match)
+            subtitle:
+            data:
         """
 
         self.clean()
@@ -171,5 +173,36 @@ class Display:
         print("\n" * 1)
         for n, tournament in enumerate(data):
             print(
-                f"{n + 1} : {tournament['id']} - {tournament['name']} -"
+                f"\t{n + 1} : {tournament['id']} - {tournament['name']} -"
                 f" {tournament['tournament_date']} - {tournament['location']}")
+
+    def report_round_tournament(self, subtitle="Affichage des rounds du tournoi", *, data: list):
+        """
+        Method to display and select the winner of the match.
+        Args:
+            subtitle:
+            data:
+        """
+
+        self.clean()
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\n{subtitle}")
+        print("\n" * 1)
+        for round in data:
+            print(f"\t{round.name} - Débuté : {round.start} - Fini : {round.end}")
+
+    def report_matches_tournament(self, subtitle="Affichages des matchs du tournoi", *, data: list):
+        """
+        Method to display and select the winner of the match.
+        Args:
+            subtitle:
+            data:
+        """
+
+        self.clean()
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\n{subtitle}")
+        print("\n" * 1)
+        for round in data:
+            print(f"\t{round.name} - Débuté : {round.start} - Fini : {round.end}")
+            for match in round.matches:
+                print(f"\t\t{match.players[0].fullname} vs {match.players[1].fullname}"
+                      f" - Score : {match.score[0]} - {match.score[1]}")
