@@ -47,11 +47,13 @@ class BaseController:
         user_input = self.view_menu.input(ask_input)
 
         if dict is not None:
-            menu_to_analyse = menu
+            menu_to_analyse = menu.copy()
             try:
                 user_input = int(user_input)
             except ValueError:
-                self.ask_and_launch(ask_input, menu=menu)
+                r = self.ask_and_launch(ask_input, menu=menu_to_analyse)
+                return r
+
             if menu[user_input][0] == "back":
                 return True
 

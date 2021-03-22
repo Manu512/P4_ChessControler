@@ -14,15 +14,27 @@
         },
         "10": {
             "_genre": "H",
-            "dob": "01/01/2020",
-            "elo": 0,
-            "first_name": "Maxime",
+            "dob": "05/08/1971",
+            "elo": "1050",
+            "first_name": "Manuel",
             "has_met": [],
-            "id": 10,
-            "name": "WALDNER",
+            "id": 7,
+            "name": "WITZ",
             "point": 0,
             "status": false,
-            "uuid": "8eee6e78-d857-4e10-9443-63c17528bf24"
+            "uuid": "46f66e24-5d8a-49f3-83ee-87646a23a358"
+        },
+        "11": {
+            "_genre": "H",
+            "dob": "01/01/2002",
+            "elo": 1150,
+            "first_name": "DE TEST",
+            "has_met": [],
+            "id": 11,
+            "name": "JOEVIN",
+            "point": 0,
+            "status": false,
+            "uuid": "d95dd9a1-41bc-41ca-ba46-47323000b47f"
         },
         "2": {
             "_genre": "H",
@@ -62,18 +74,6 @@
         },
         "5": {
             "_genre": "H",
-            "dob": "18/06/1980",
-            "elo": 1200,
-            "first_name": "Emmanuel",
-            "has_met": [],
-            "id": 1,
-            "name": "WALDNER",
-            "point": 0,
-            "status": false,
-            "uuid": "f7bac1ac-8162-43c6-9bb9-22f327f479ae"
-        },
-        "6": {
-            "_genre": "H",
             "dob": "26/01/1950",
             "elo": 0,
             "first_name": "Bernard",
@@ -84,19 +84,7 @@
             "status": false,
             "uuid": "b0326567-39b5-4686-be29-3e00aa52f930"
         },
-        "7": {
-            "_genre": "H",
-            "dob": "17/08/2018",
-            "elo": 0,
-            "first_name": "Rapha\u00ebl",
-            "has_met": [],
-            "id": 3,
-            "name": "WALDNER",
-            "point": 0,
-            "status": false,
-            "uuid": "ce46672a-1043-455b-af91-d21176c56a87"
-        },
-        "8": {
+        "6": {
             "_genre": "F",
             "dob": "18/04/1953",
             "elo": 0,
@@ -108,17 +96,41 @@
             "status": false,
             "uuid": "53ff7e62-d2be-42b7-86f9-738454b68887"
         },
-        "9": {
+        "7": {
             "_genre": "H",
-            "dob": "05/08/1971",
-            "elo": "1050",
-            "first_name": "Manuel",
+            "dob": "18/06/1980",
+            "elo": 1200,
+            "first_name": "Emmanuel",
             "has_met": [],
-            "id": 7,
-            "name": "WITZ",
+            "id": 1,
+            "name": "WALDNER",
             "point": 0,
             "status": false,
-            "uuid": "46f66e24-5d8a-49f3-83ee-87646a23a358"
+            "uuid": "f7bac1ac-8162-43c6-9bb9-22f327f479ae"
+        },
+        "8": {
+            "_genre": "H",
+            "dob": "01/01/2020",
+            "elo": 0,
+            "first_name": "Maxime",
+            "has_met": [],
+            "id": 10,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "8eee6e78-d857-4e10-9443-63c17528bf24"
+        },
+        "9": {
+            "_genre": "H",
+            "dob": "17/08/2018",
+            "elo": 0,
+            "first_name": "Rapha\u00ebl",
+            "has_met": [],
+            "id": 3,
+            "name": "WALDNER",
+            "point": 0,
+            "status": false,
+            "uuid": "ce46672a-1043-455b-af91-d21176c56a87"
         }
     }
 }

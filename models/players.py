@@ -174,8 +174,6 @@ class Player:
         """
         Class method that returns the list of all instantiated players.
         """
-        # ret = [player for player in cls.PLAYERS]
-
         return cls.PLAYERS
 
     @classmethod
