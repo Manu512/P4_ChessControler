@@ -27,7 +27,7 @@ class ReportController(BaseController):
                 4: (self.list_tournament_players_sort_elo, "Liste de tous les joueurs d'un tournoi classé selon"),
                 5: (self.list_tournaments, "Liste de tous les tournois"),
                 6: (self.list_all_rounds, "Liste de tous les tours du tournoi"),
-                7: (self.list_all_matchs, "Liste de tous les matches du tournoi"),
+                7: (self.list_all_matchs, "Liste de tous les matchs du tournoi"),
                 9: (str('back'), 'Retour au menu')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
