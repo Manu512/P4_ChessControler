@@ -40,27 +40,50 @@ class Controller(BaseController):
         """
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion du tournoi."
+        menu = {1: (self.menu_config_tournament, 'Créer un nouveau tournoi'),
+                2: (self.load_tournament, "Charger un tournoi sauvegardé"),
+                3: (self.launch_menu_round, "Gestion du tournoi en cours"),
+                4: (),
+                5: (),
+                9: (str('back'), 'Retour Accueil')}
+
+        if self.tournament is not None:
+            menu[4] = (self.stop_tournament, "Arrêter le tournoi (attention sauvegarder avant !!!)")
+            menu[5] = (self.save_tournament, "Sauvegarder tournoi en cours")
+        else:
+            del menu[3]
+            del menu[4]
+            del menu[5]
+
+        self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
+
+        self.ask_and_launch(menu=menu)
+
+    def menu_config_tournament(self):
+        """
+        Menu which allows the setting of the tournament.
+        """
+        player_control = PlayerController()
+
+        title = "Bienvenue dans le gestionnaire de tournois d'échec."
+        subtitle = "Page de gestion du tournoi."
 
         menu = {1: (self.change_name_tournament, f"Nom : {Tournament.NAME}"),
                 2: (self.change_number_round_tournament, f"Nombre de rounds : {Tournament.NB_ROUND}"),
                 3: (self.change_timer_rules, f"Règle de temps : {Tournament.TIMER}"),
                 4: (self.change_location, f"Localisation : {Tournament.LOCATION}"),
                 5: (self.add_description, f"Description : {Tournament.DESCRIPTION}"),
-                6: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
-                7: (self.launch_menu_round, "Gestion des rounds"),
-                8: (self.load_tournament, "Charger un tournoi sauvegardé"),
+                6: (player_control.add_player_tournament, "Ajouter un participant au tournoi"),
+                7: (player_control.remove_player_tournament, "Retirer un participant du tournoi"),
+                'Info': ("None", f'Nombre de joueurs sélectionné : {Player._NB_ACTIVE_PLAYERS} '
+                                 f'| Places disponibles {8 - Player._NB_ACTIVE_PLAYERS}'),
+                8: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
                 9: (str('back'), 'Retour Accueil')}
-
-        if self.tournament is not None:
-            menu[6] = (self.stop_tournament, "Arrêter le tournoi (attention sauvegarder avant !!!)")
-            menu[8] = (self.save_tournament, "Sauvegarder tournoi en cours")
-        else:
-            del menu[7]
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
         r = self.ask_and_launch(menu=menu)
         if self.back_menu(r):
-            self.menu_tournament()
+            self.menu_config_tournament()
 
     # --------------------------TOURNAMENTS METHODS--------------------------------
 
@@ -157,16 +180,25 @@ class Controller(BaseController):
         self.launch_menu_round()
 
     def launch_menu_round(self):
+        """
+        Method for calling the Tournament Controller
+        """
         ret = True
         while ret:
             ret = RoundController(self.tournament).menu_round()
 
     def launch_menu_report(self):
+        """
+        Method for calling the report controller
+        """
         ret = True
         while ret:
             ret = ReportController().menu_rapport()
 
     def launch_menu_players(self):
+        """
+        Method for calling the Player Controller
+        """
         ret = True
         while ret:
             ret = PlayerController().menu_players()

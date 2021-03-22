@@ -7,6 +7,6 @@ __pypackages__/
 
 # Environments
 .vscode/
-.vscode/
 .idea/
 env/
+venv/

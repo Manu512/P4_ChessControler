@@ -22,9 +22,10 @@ class Player:
     _PLAYERS = []
 
     def __new__(cls, **kwargs):
-        for player in cls._PLAYERS:
-            if player.uuid == kwargs['uuid']:
-                return
+        if 'uuid' in kwargs:
+            for player in cls._PLAYERS:
+                if player.uuid == kwargs['uuid']:
+                    return
         self = super().__new__(cls)
         self._PLAYERS.append(self)
         return self
@@ -132,10 +133,13 @@ class Player:
             self.status = False
         else:
             self.status = True
-
-        p = []
-        Player._NB_ACTIVE_PLAYERS = len([p.append(player) for player in Player._PLAYERS if player.status])
+        self.count_active_players()
         self.update_player()
+
+    @classmethod
+    def count_active_players(cls):
+        p = []
+        cls._NB_ACTIVE_PLAYERS = len([p.append(player) for player in cls._PLAYERS if player.status])
 
     @classmethod
     def isactiveplayerlistpair(cls) -> bool:
@@ -170,6 +174,7 @@ class Player:
         Class method that returns the list of all instantiated players.
         """
         # ret = [player for player in cls._PLAYERS]
+
         return cls._PLAYERS
 
     @classmethod
@@ -180,7 +185,7 @@ class Player:
         """
 
         ret = [player for player in cls._PLAYERS if player.status]
-        cls._NB_ACTIVE_PLAYERS = len(ret)
+        cls.count_active_players()
         return ret
 
 # --------------------------TinyDB parts---------------------------------------
@@ -211,3 +216,4 @@ class Player:
         """
         serialized_players_list = cls.__db.all()
         [Player(**data) for data in serialized_players_list]
+        cls.count_active_players()

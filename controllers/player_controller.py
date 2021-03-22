@@ -23,9 +23,6 @@ class PlayerController(BaseController):
 
         menu = {1: (self.add_player, "Créer un joueur"),
                 2: (self.update_player_elo, "Modifier le classement ELO d'un joueur"),
-                3: (self.add_player_tournament, "Ajouter un joueur au tournoi actuel"),
-                4: (self.remove_player_tournament, "Supprimer un joueur du tournoi actuel"),
-                5: (self.remove_all_player_tournament, "Supprimer tous les joueurs du tournoi actuel"),
                 9: (str('back'), 'Retour au menu')}
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
@@ -54,22 +51,26 @@ class PlayerController(BaseController):
         choice = ('name', 'first_name', 'dob', '_genre')
         response = []
 
-        for m in range(len(choice)):
-            if choice[m] in ['name', 'first_name']:
-                valid = self.ask_and_store_text(menu[m + 1][1] + ' : ')
+        for i in range(4):
+            if 0 <= i <= 1:  # pour les question nom et prénom
+
+                valid = self.ask_and_store_text(menu[i + 1][1] + ' : ')
                 while not valid[0]:
-                    valid = self.ask_and_store_text(menu[m + 1][1] + ' : ')
+                    valid = self.ask_and_store_text(menu[i + 1][1] + ' : ')
                 response.append(valid[1])
-            elif choice[m] == 'dob':
-                valid = self.view_menu.input(menu[m + 1][1] + ' : ')
+
+            elif i == 2:  # pour la date de naissance
+                valid = self.view_menu.input(menu[i + 1][1] + ' : ')
                 while not self._control_user_input("dob", valid):
-                    valid = self.view_menu.input(menu[m + 1][1] + ' : ')
-                response.append(valid[1])
-            elif choice[m] == '_genre':
-                valid = self.view_menu.input(menu[m + 1][1] + ' : ')
-                while not self._control_user_input("_genre", valid):
-                    valid = self.view_menu.input(menu[m + 1][1] + ' : ')
+                    valid = self.view_menu.input(menu[i + 1][1] + ' : ')
                 response.append(valid)
+
+            elif i == 3:  # pour la saisie du genre
+                valid = self.view_menu.input(menu[i + 1][1] + ' : ')
+                while not self._control_user_input("_genre", valid):
+                    valid = self.view_menu.input(menu[i + 1][1] + ' : ')
+                response.append(valid)
+
             res = dict(zip(choice, response))
         Player(**res)
         Player.save_all_players()
