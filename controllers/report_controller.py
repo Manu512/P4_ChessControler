@@ -80,9 +80,12 @@ class ReportController(BaseController):
 
     def list_tournaments(self):
         """
-        Fonction qui va lancer le print de la liste des tournois
+        Function that will print the list of tournaments
         """
-        pass
+        data = self.load_saved_tournament()
+        subtitle = 'Liste des tournois sauvegardés'
+        self.view_menu.view_saved_tournament(subtitle, data=data)
+        self.view_menu.stand_by_msg()
 
     def list_all_rounds(self):
         """

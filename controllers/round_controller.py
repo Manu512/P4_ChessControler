@@ -45,7 +45,7 @@ class RoundController(BaseController):
                                            f'pour pouvoir démarrer le prochain round')
             elif len(result) == 0 and self.round.number == self.tournament.max_rounds_number:
                 self.tournament.save()
-                menu[6] = (self.view_result, "Tournoi terminé - Affiché les résultats")
+                menu[6] = (self.view_result, "Tournoi terminé - Afficher les résultats")
             elif len(result) == 0 and self.round.number < self.tournament.max_rounds_number:
                 menu[4] = (self.display_list_round_matchs, 'Consulter les résultats des matchs')
                 del menu[5]

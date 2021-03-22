@@ -48,6 +48,23 @@ class Display:
         Args:
             title: str: Main title of the console
             subtitle: str: Subtitle of the console
+
+        """
+        self.clean()
+        print(f"{title}")
+        print(f"{subtitle}\n")
+        for data in datas:
+            print(f"\t{data}")
+        print("\n" * 2)
+        self.stand_by_msg("")
+
+    def display_tournament(self, title: str, subtitle: str = "\n", datas: list = None):
+        """
+        Method to display tournament list.
+
+        Args:
+            title: str: Main title of the console
+            subtitle: str: Subtitle of the console
             question: dict{ int(Choice) : Tuple( method to launch, Text to display )}
         """
         self.clean()
@@ -142,14 +159,15 @@ class Display:
         return ret
 
     # ---------------- saved Tournament ---------------------------
-    def select_saved_tournament(self, data: dict):
+    def view_saved_tournament(self, subtitle = "Selection des sauvegardes :",* , data: dict):
         """
         Method to display and select the winner of the match.
         Args:
             match: obj(Match)
         """
+
         self.clean()
-        print("Bienvenue dans le gestionnaire de tournois d'échec.\nSelection des sauvegardes :")
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\n{subtitle}")
         print("\n" * 1)
         for n, tournament in enumerate(data):
             print(

@@ -1,8 +1,6 @@
 """Controller"""
 # coding:utf-8
 
-from tinydb import TinyDB
-
 from controllers import BaseController
 from controllers.round_controller import RoundController
 from controllers.report_controller import ReportController
@@ -90,11 +88,10 @@ class Controller(BaseController):
             self.menu_config_tournament()
 
     # --------------------------TOURNAMENTS METHODS--------------------------------
+
     def menu_select_saved_tournament(self):
-        __db = TinyDB('tournament.json', sort_keys=True, indent=4, separators=(',', ': '))
-        table_tournoi = __db.table('tournament')
-        tournaments = table_tournoi.all()
-        self.view_menu.select_saved_tournament(tournaments)
+        tournaments = self.load_saved_tournament()
+        self.view_menu.view_saved_tournament(data=tournaments)
         ret = None
         t = False
         while not t:
