@@ -149,9 +149,9 @@ class Display:
             match: obj(Match)
         """
         self.clean()
-        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSelection des sauvegardes :")
+        print("Bienvenue dans le gestionnaire de tournois d'échec.\nSelection des sauvegardes :")
         print("\n" * 1)
         for n, tournament in enumerate(data):
             print(
-                f"{n + 1} : {tournament['id']} - {tournament['name']} - {tournament['tournament_date']} - {tournament['location']}")
-
+                f"{n + 1} : {tournament['id']} - {tournament['name']} -"
+                f" {tournament['tournament_date']} - {tournament['location']}")

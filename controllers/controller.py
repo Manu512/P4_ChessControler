@@ -1,7 +1,7 @@
 """Controller"""
 # coding:utf-8
 
-from tinydb import Query, TinyDB
+from tinydb import TinyDB
 
 from controllers import BaseController
 from controllers.round_controller import RoundController
@@ -238,7 +238,3 @@ class Controller(BaseController):
         Method for deleting the tournament attribute
         """
         self.tournament = None
-
-if __name__ == '__main__':
-    m = Controller()
-    m.menu_select_saved_tournament()
