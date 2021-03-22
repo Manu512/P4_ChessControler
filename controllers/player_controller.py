@@ -139,14 +139,6 @@ class PlayerController(BaseController):
                     player.switch_player_tournament()
                     Player.save_all_players()
 
-    @staticmethod
-    def remove_all_player_tournament():
-        """
-        Appel de la methode pour désinscrire tout les joueurs.
-        """
-        Player.all_players_inactive()
-        Player.save_all_players()
-
     def found_specific_player(self) -> Player:
         """
         Method that will search for a player based on his Last Name and First Name.
