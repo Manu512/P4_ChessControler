@@ -1,6 +1,8 @@
 """Controller"""
 # coding:utf-8
 
+from tinydb import Query, TinyDB
+
 from controllers import BaseController
 from controllers.round_controller import RoundController
 from controllers.report_controller import ReportController
@@ -43,17 +45,13 @@ class Controller(BaseController):
         menu = {1: (self.menu_config_tournament, 'Créer un nouveau tournoi'),
                 2: (self.load_tournament, "Charger un tournoi sauvegardé"),
                 3: (self.launch_menu_round, "Gestion du tournoi en cours"),
-                4: (),
-                5: (),
                 9: (str('back'), 'Retour Accueil')}
 
         if self.tournament is not None:
-            menu[4] = (self.stop_tournament, "Arrêter le tournoi (attention sauvegarder avant !!!)")
-            menu[5] = (self.save_tournament, "Sauvegarder tournoi en cours")
+            menu[1] = (self.stop_tournament, "Arrêter le tournoi (attention sauvegarder avant !!!)")
+            menu[2] = (self.save_tournament, "Sauvegarder tournoi en cours")
         else:
             del menu[3]
-            del menu[4]
-            del menu[5]
 
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
@@ -64,6 +62,7 @@ class Controller(BaseController):
         Menu which allows the setting of the tournament.
         """
         player_control = PlayerController()
+        player_active = ReportController().list_tournament_players_sort_alpha
 
         title = "Bienvenue dans le gestionnaire de tournois d'échec."
         subtitle = "Page de gestion du tournoi."
@@ -80,12 +79,29 @@ class Controller(BaseController):
                 8: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
                 9: (str('back'), 'Retour Accueil')}
 
+        if Player.NB_ACTIVE_PLAYERS < Tournament.NB_DEFAULT_PLAYERS:
+            menu[8] = (player_active, 'Afficher la liste des participants')
+        else:
+            menu[6] = (player_active, 'Afficher la liste des participants')
+
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
-        r = self.ask_and_launch(menu=menu)
-        if self.back_menu(r):
+
+        if self.back_menu(self.ask_and_launch(menu=menu)):
             self.menu_config_tournament()
 
     # --------------------------TOURNAMENTS METHODS--------------------------------
+    def menu_select_saved_tournament(self):
+        __db = TinyDB('tournament.json', sort_keys=True, indent=4, separators=(',', ': '))
+        table_tournoi = __db.table('tournament')
+        tournaments = table_tournoi.all()
+        self.view_menu.select_saved_tournament(tournaments)
+        ret = None
+        t = False
+        while not t:
+            ret = self.ask_and_store_number()
+            t = ret[0]
+
+        return Tournament.load(ret[1])
 
     def change_name_tournament(self):
         """
@@ -207,7 +223,7 @@ class Controller(BaseController):
         """
         Method to load a tournament
         """
-        self.tournament = Tournament.load()
+        self.tournament = self.menu_select_saved_tournament()
         self.round = self.tournament.rounds[-1]
         self.launch_menu_round()
 
@@ -222,3 +238,7 @@ class Controller(BaseController):
         Method for deleting the tournament attribute
         """
         self.tournament = None
+
+if __name__ == '__main__':
+    m = Controller()
+    m.menu_select_saved_tournament()

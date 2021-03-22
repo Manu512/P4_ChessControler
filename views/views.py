@@ -38,7 +38,7 @@ class Display:
         print(f"{title}")
         print(f"{subtitle}\n")
         for key, value in question.items():
-            print(f"\t{key} : {value[1]}")
+            print(f"\t{key} - {value[1]}")
         print("\n" * 2)
 
     def display_data(self, title: str, subtitle: str = "\n", datas: list = None):
@@ -140,3 +140,18 @@ class Display:
         """
         ret = input(msg)
         return ret
+
+    # ---------------- saved Tournament ---------------------------
+    def select_saved_tournament(self, data: dict):
+        """
+        Method to display and select the winner of the match.
+        Args:
+            match: obj(Match)
+        """
+        self.clean()
+        print(f"Bienvenue dans le gestionnaire de tournois d'échec.\nSelection des sauvegardes :")
+        print("\n" * 1)
+        for n, tournament in enumerate(data):
+            print(
+                f"{n + 1} : {tournament['id']} - {tournament['name']} - {tournament['tournament_date']} - {tournament['location']}")
+

@@ -120,10 +120,10 @@ class RoundController(BaseController):
         p.sort(reverse=True, key=lambda x: (int(x.point), int(x.elo)))
         data = []
         for n, player in enumerate(p):
-            data.append(f"{player.fullname} ({player.age} ans) avec {player.point} points,"
-                        f" classement ELO : {player.elo})")
+            data.append(f"{n + 1} - {player.fullname} ({player.age} ans) avec {player.point} points,"
+                        f" classement ELO : {player.elo}")
 
         title = "Bienvenue dans le gestionnaire de tournois d'échec.\n"
-        subtitle = "Résultat du tournoi."
+        subtitle = "Classement du tournoi."
 
         self.view_menu.display_data(title, subtitle, data)

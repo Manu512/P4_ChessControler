@@ -107,16 +107,16 @@ class Tournament:
         return self
 
     @classmethod
-    def load(cls):
+    def load(cls, save_id: int):
         """
         Method of loading a backup tournament
         """
         Player.initialise_players_data()
         Player.load_players()
         Player.all_players_inactive()
-        data_load = cls.table_tournoi.all()
+        data_load = cls.table_tournoi.get(doc_id=save_id)
 
-        data_load = data_load[-1]
+        # data_load = data_load[-1]
 
         t = {}
         # --------- Load Objet Tournament ----------
