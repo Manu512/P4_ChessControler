@@ -26,7 +26,7 @@ class Tournament:
 
     def __init__(self, identity: str = None, name: str = "Tournoi d'échec", location: str = None,
                  tournament_date: str = None, description: str = None,
-                 timer: str = TIMER, rounds: list[Round] = None, max_rounds_number: int = NB_ROUND):
+                 timer: str = TIMER, max_rounds_number: int = NB_ROUND):
 
         if isinstance(identity, str) and identity is not None:
             self.id = identity
@@ -54,6 +54,7 @@ class Tournament:
             self.description = description
         else:
             self.description = self.DESCRIPTION
+
         self.rounds = []
 
         if isinstance(max_rounds_number, int) and max_rounds_number is not None:
@@ -128,13 +129,8 @@ class Tournament:
         t['description'] = data_load['description']
         t['max_rounds_number'] = data_load['max_rounds_number']
 
-        tournament = Tournament(t['identity'],
-                                t['name'],
-                                t['location'],
-                                t['tournament_date'],
-                                t['description'],
-                                t['timer'],
-                                max_rounds_number=t['max_rounds_number'])
+        tournament = Tournament(t['identity'], t['name'], t['location'], t['tournament_date'], t['description'],
+                                t['timer'], max_rounds_number=t['max_rounds_number'])
 
         # --------- Load Objet Player ---------------
 
@@ -145,7 +141,7 @@ class Tournament:
             2 - On lui affecte le nombre de point stocker en player[1]
             3 - On renseigne les rencontres existantes stocker en player[2]
             """
-            p_found = [p for p in Player._PLAYERS if player[0] == p.uuid]
+            p_found = [p for p in Player.PLAYERS if player[0] == p.uuid]
 
             assert p_found          # Raises an exception if the player is not found
 
@@ -161,11 +157,9 @@ class Tournament:
 
         t['rounds'] = data_load['rounds']
         for n, round in enumerate(t['rounds']):
-            """
-            1 - We scan the saved rounds.
-            2 - We extract the information from the rounds.
-            3 - We extract the matches and the scores.
-            """
+            # 1 - We scan the saved rounds.
+            # 2 - We extract the information from the rounds.
+            # 3 - We extract the matches and the scores.
             if n % 2 == 0:
                 tournament.rounds.append(Round(round['number'],
                                          Player.list_player_tournament(),

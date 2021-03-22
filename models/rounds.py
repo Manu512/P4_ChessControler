@@ -51,7 +51,7 @@ class Round:
             for data_match in matches:
                 play = []
                 for player in data_match[0]:
-                    play.append([p for p in Player._PLAYERS if player == p.uuid])
+                    play.append([p for p in Player.PLAYERS if player == p.uuid])
 
                 play[0] = play[0][0]
                 play[1] = play[1][0]

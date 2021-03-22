@@ -161,7 +161,7 @@ class PlayerController(BaseController):
                 valid = self.ask_and_store_text(question)
             search_response.append(valid[1])
 
-        for player in Player._PLAYERS:
+        for player in Player.PLAYERS:
             if player.name.upper() == search_response[0].upper() and \
                     player.first_name.capitalize() == search_response[1].capitalize():
                 return player

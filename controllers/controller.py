@@ -75,8 +75,8 @@ class Controller(BaseController):
                 5: (self.add_description, f"Description : {Tournament.DESCRIPTION}"),
                 6: (player_control.add_player_tournament, "Ajouter un participant au tournoi"),
                 7: (player_control.remove_player_tournament, "Retirer un participant du tournoi"),
-                'Info': ("None", f'Nombre de joueurs sélectionné : {Player._NB_ACTIVE_PLAYERS} '
-                                 f'| Places disponibles {8 - Player._NB_ACTIVE_PLAYERS}'),
+                'Info': ("None", f'Nombre de joueurs sélectionné : {Player.NB_ACTIVE_PLAYERS} '
+                                 f'| Places disponibles {Tournament.NB_DEFAULT_PLAYERS - Player.NB_ACTIVE_PLAYERS}'),
                 8: (self.create_tournament, 'Initialiser un nouveau tournoi avec ces valeurs'),
                 9: (str('back'), 'Retour Accueil')}
 

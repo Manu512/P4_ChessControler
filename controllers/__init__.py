@@ -52,7 +52,8 @@ class BaseController:
                 self.ask_and_launch(ask_input, menu=menu)
             if menu[user_input][0] == "back":
                 return True
-            elif self.check_choice(list(menu.keys()), user_input):
+
+            if self.check_choice(list(menu.keys()), user_input):
                 menu[user_input][0]()
             else:
                 self.ask_and_launch(ask_input, menu=menu_to_analyse)

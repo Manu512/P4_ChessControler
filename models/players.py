@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from datetime import datetime as dt
+from typing import Any
 from uuid import uuid4
 
 from tinydb import Query, TinyDB
@@ -17,17 +18,17 @@ class Player:
     __db = TinyDB('players.json', sort_keys=True, indent=4, separators=(',', ': '))
     __db = __db.table('players')
 
-    _NB_PLAYER = 0
-    _NB_ACTIVE_PLAYERS = 0
-    _PLAYERS = []
+    NB_PLAYER: int = 0
+    NB_ACTIVE_PLAYERS: int = 0
+    PLAYERS: list[Any] = []
 
     def __new__(cls, **kwargs):
         if 'uuid' in kwargs:
-            for player in cls._PLAYERS:
+            for player in cls.PLAYERS:
                 if player.uuid == kwargs['uuid']:
-                    return
+                    return None
         self = super().__new__(cls)
-        self._PLAYERS.append(self)
+        self.PLAYERS.append(self)
         return self
 
     def __init__(self, **kwargs):
@@ -39,8 +40,8 @@ class Player:
         self.point = 0
         self.has_met = []
         self.status = False
-        Player._NB_PLAYER = Player._NB_PLAYER + 1
-        self.id = Player._NB_PLAYER
+        Player.NB_PLAYER = Player.NB_PLAYER + 1
+        self.id = Player.NB_PLAYER
         self.uuid = str(uuid4())
 
         for attr_name, attr_value in kwargs.items():
@@ -56,7 +57,7 @@ class Player:
         """
         q = Query()
         players_table = self.__db
-        player_data = self.__serialize_player()
+        player_data = self.serialize_player()
         players_table.upsert(player_data, q.uuid == self.uuid)
 
     @classmethod
@@ -64,7 +65,7 @@ class Player:
         """
         Methode pour désinscrire tous les joueurs du tournoi
         """
-        [player.switch_player_tournament() for player in cls._PLAYERS if player.status]
+        [player.switch_player_tournament() for player in cls.PLAYERS if player.status]
 
     @property
     def age(self) -> int:
@@ -139,7 +140,7 @@ class Player:
     @classmethod
     def count_active_players(cls):
         p = []
-        cls._NB_ACTIVE_PLAYERS = len([p.append(player) for player in cls._PLAYERS if player.status])
+        cls.NB_ACTIVE_PLAYERS = len([p.append(player) for player in cls.PLAYERS if player.status])
 
     @classmethod
     def isactiveplayerlistpair(cls) -> bool:
@@ -147,7 +148,7 @@ class Player:
         Method to find out if the list of active players is even
         """
         cls.list_player_tournament()
-        if cls._NB_ACTIVE_PLAYERS % 2:
+        if cls.NB_ACTIVE_PLAYERS % 2:
             ret = False                 # Odd
         else:
             ret = True                  # Pair
@@ -173,9 +174,9 @@ class Player:
         """
         Class method that returns the list of all instantiated players.
         """
-        # ret = [player for player in cls._PLAYERS]
+        # ret = [player for player in cls.PLAYERS]
 
-        return cls._PLAYERS
+        return cls.PLAYERS
 
     @classmethod
     def list_player_tournament(cls) -> list:
@@ -184,7 +185,7 @@ class Player:
         :return: list of the registered players
         """
 
-        ret = [player for player in cls._PLAYERS if player.status]
+        ret = [player for player in cls.PLAYERS if player.status]
         cls.count_active_players()
         return ret
 
@@ -197,11 +198,11 @@ class Player:
         """
         players_db = cls.__db
         players_db.truncate()
-        serialized_players = [cls.player.__serialize_player() for cls.player
-                              in cls._PLAYERS]
+        serialized_players = [cls.player.serialize_player() for cls.player
+                              in cls.PLAYERS]
         players_db.insert_multiple(serialized_players)
 
-    def __serialize_player(self) -> dict:
+    def serialize_player(self) -> dict:
         """
         Method to return the set of arguments as a dictionary
         :return: dict
