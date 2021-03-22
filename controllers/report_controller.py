@@ -14,7 +14,6 @@ class ReportController(BaseController):
     def __init__(self, tournament):
         super().__init__(tournament)
 
-
     def menu_rapport(self):
         """
         Method for displaying the report management menu
