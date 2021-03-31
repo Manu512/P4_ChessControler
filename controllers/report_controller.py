@@ -30,6 +30,10 @@ class ReportController(BaseController):
                 7: (self.list_all_matchs, "Liste de tous les matchs du tournoi"),
                 9: (str('back'), 'Retour au menu')}
 
+        if self.tournament is None:
+            del menu[6]
+            del menu[7]
+
         self.view_menu.display_menu(title=title, subtitle=subtitle, question=menu)
 
         r = self.ask_and_launch(menu=menu)

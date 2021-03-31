@@ -204,5 +204,8 @@ class Display:
         for round in data:
             print(f"\t{round.name} - Débuté : {round.start} - Fini : {round.end}")
             for match in round.matches:
-                print(f"\t\t{match.players[0].fullname} vs {match.players[1].fullname}"
-                      f" - Score : {match.score[0]} - {match.score[1]}")
+                if match.score is None:
+                    print(f"\t\t{match.players[0].fullname} vs {match.players[1].fullname} en cours")
+                else:
+                    print(f"\t\t{match.players[0].fullname} vs {match.players[1].fullname}"
+                          f" - Score : {match.score[0]} - {match.score[1]}")
