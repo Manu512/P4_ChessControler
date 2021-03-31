@@ -169,6 +169,10 @@ class Player:
                 ({'has_met': []}, q.has_met.exists())
         ])
 
+        for player in cls.PLAYERS:
+            player.point = 0
+            player.has_met = []
+
     @classmethod
     def list_all_player(cls) -> list:
         """
