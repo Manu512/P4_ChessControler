@@ -67,10 +67,11 @@ class RoundController(BaseController):
         Method that calls up the view that informs the winners of the different matches
         """
         self.view_menu.select_match(self.round)
-        response = self.ask_and_store_number("Choisissez le match pour renseigner le vainqueur :")
 
-        if 1 <= response[1] <= 4:
-            if response[0]:     # response = tuple(False/True if valid input, input value)
+        response = self.ask_and_store_number("Choisissez le match pour renseigner le vainqueur :")
+        if response[0]:
+            if 1 <= response[1] <= 4:
+                 # response = tuple(False/True if valid input, input value)
                 match_played = self.round.matches[response[1]-1]
 
                 if match_played.score is None:
