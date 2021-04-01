@@ -193,7 +193,9 @@ class Controller(BaseController):
         Method for initiating a new tournament
         """
         Player.initialise_players_data()
-        super().__init__(Tournament())
+        super().__init__(Tournament(identity=None, name=Tournament.NAME,
+                                    location=Tournament.LOCATION, description=Tournament.DESCRIPTION,
+                                    timer=Tournament.TIMER, max_rounds_number=Tournament.NB_ROUND))
         self.tournament.add_round()
         self.round = self.tournament.rounds[-1]
         self.launch_menu_round()
